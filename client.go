@@ -18,11 +18,13 @@ func main() {
 	var args graphproto.NewGraphRequest
 	var reply graphproto.NewGraphResponse
 
-	for i := 0; i < 1000; i++ {
+	for i := 0; i < 10000; i++ {
 		args.Name = proto.String("hello, world")
 		if err = stub.Newgraph(&args, &reply); err != nil {
 			log.Fatal("graphproto error:", err)
 		}
-		fmt.Printf("Result: (%s)=%d\n", args.GetName(), reply.GetRes())
+		if i%1000 == 0 {
+			fmt.Printf("Result: (%s)=%d\n", args.GetName(), reply.GetRes())
+		}
 	}
 }
