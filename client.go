@@ -11,7 +11,7 @@ func main() {
 	fmt.Println("Starting")
 	stub, client, err := graphproto.DialGraphService("tcp", "127.0.0.1:1984")
 	if err != nil {
-		log.Fatal(`arith.DialGraphService("tcp", "127.0.0.1:1984"):`, err)
+		log.Fatal(`graphproto.DialGraphService("tcp", "127.0.0.1:1984"):`, err)
 	}
 	defer client.Close()
 
