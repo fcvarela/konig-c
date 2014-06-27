@@ -17,11 +17,11 @@ func errorCallback(err glfw.ErrorCode, desc string) {
 	fmt.Printf("%v: %v\n", err, desc)
 }
 
-func (g *GraphRenderer) Bootstrap() error {
+func NewGraphRenderer() (*GraphRenderer, error) {
 	glfw.SetErrorCallback(errorCallback)
 
 	if !glfw.Init() {
-		return errors.New("Can't init glfw!")
+		return nil, errors.New("Can't init glfw!")
 	}
 
 	// make sure we get a core profile
@@ -32,24 +32,25 @@ func (g *GraphRenderer) Bootstrap() error {
 
 	monitor, err := glfw.GetPrimaryMonitor()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	videomode, err := monitor.GetVideoMode()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	g.window, err = glfw.CreateWindow(videomode.Width/2.0, videomode.Height/2.0, "Konig", nil, nil)
+	gr := GraphRenderer{}
+	gr.window, err = glfw.CreateWindow(videomode.Width/2.0, videomode.Height/2.0, "Konig", nil, nil)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	g.window.MakeContextCurrent()
-	g.GLContextVersion = gl.GetString(gl.VERSION)
-	g.Finished = false
+	gr.window.MakeContextCurrent()
+	gr.GLContextVersion = gl.GetString(gl.VERSION)
+	gr.Finished = false
 
-	return nil
+	return &gr, nil
 }
 
 func (g *GraphRenderer) Update() {

@@ -6,22 +6,19 @@ import (
 )
 
 func main() {
-	var g graphrenderer.GraphRenderer
-	err := g.Bootstrap()
+	// create our renderer
+	gr, err := graphrenderer.NewGraphRenderer()
 	if err != nil {
 		panic(err.Error())
 	}
 
-	var s graphserver.GraphServer
-	err = s.Bootstrap()
-	if err != nil {
-		panic(err.Error())
+	// create a server to manipulate graphs
+	gs, err := graphserver.NewGraphServer()
+
+	for !gr.Finished {
+		gr.Frame()
 	}
 
-	for !g.Finished {
-		g.Frame()
-	}
-
-	g.Shutdown()
-	s.Shutdown()
+	gs.Shutdown()
+	gr.Shutdown()
 }

@@ -1,16 +1,16 @@
 package graphserver
 
 import (
-	"errors"
+	"../graph"
 )
 
 type GraphServer struct {
-	name string
+	Name   string
+	Graphs graph.GraphList
 }
 
-func (s *GraphServer) Bootstrap() error {
-	return nil
-	return errors.New("Could not bootstrap graphserver")
+func NewGraphServer() (*GraphServer, error) {
+	return &GraphServer{}, nil
 }
 
 func (s *GraphServer) Shutdown() {
