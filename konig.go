@@ -1,51 +1,27 @@
 package main
 
 import (
-	"fmt"
-	gl "github.com/fcvarela/gl"
-	glfw "github.com/go-gl/glfw3"
-	"log"
+	"./graphrenderer"
+	"./graphserver"
 )
 
-func errorCallback(err glfw.ErrorCode, desc string) {
-	fmt.Printf("%v: %v\n", err, desc)
-}
-
 func main() {
-	glfw.SetErrorCallback(errorCallback)
-
-	if !glfw.Init() {
-		panic("Can't init glfw!")
-	}
-	defer glfw.Terminate()
-
-	// make sure we get a core profile
-	glfw.WindowHint(glfw.ContextVersionMajor, 4)
-	glfw.WindowHint(glfw.ContextVersionMinor, 1)
-	glfw.WindowHint(glfw.OpenglForwardCompatible, glfw.True)
-	glfw.WindowHint(glfw.OpenglProfile, glfw.OpenglCoreProfile)
-
-	monitor, err := glfw.GetPrimaryMonitor()
+	var g graphrenderer.GraphRenderer
+	err := g.Bootstrap()
 	if err != nil {
-		panic(err)
+		panic(err.Error())
 	}
 
-	videomode, err := monitor.GetVideoMode()
+	var s graphserver.GraphServer
+	err = s.Bootstrap()
 	if err != nil {
-		panic(err)
+		panic(err.Error())
 	}
 
-	window, err := glfw.CreateWindow(videomode.Width, videomode.Height, "Testing", monitor, nil)
-	if err != nil {
-		panic(err)
+	for !g.Finished {
+		g.Frame()
 	}
 
-	window.MakeContextCurrent()
-	log.Println("Created window with OpenGL version:", gl.GetString(gl.VERSION))
-
-	for !window.ShouldClose() {
-		//Do OpenGL stuff
-		window.SwapBuffers()
-		glfw.PollEvents()
-	}
+	g.Shutdown()
+	s.Shutdown()
 }
