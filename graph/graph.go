@@ -18,15 +18,16 @@ type GraphList struct {
 	Graphs []Graph
 }
 
-func (gl *GraphList) Bootstrap() error {
+func NewGraphList() *GraphList {
+	gl := GraphList{}
 	gl.Graphs = make([]Graph, 0)
-	return nil
+	return &gl
 }
 
 func (gl *GraphList) NewGraph(name string) error {
 	graph := Graph{}
 
-	graph.Name = "random"
+	graph.Name = name
 	graph.Nodes = make([]Node, 0)
 	graph.Edges = make([]Edge, 0)
 

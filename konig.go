@@ -6,14 +6,20 @@ import (
 )
 
 func main() {
-	// create our renderer
-	gr, err := graphrenderer.NewGraphRenderer()
+	// create a server to manipulate graphs and fire it up
+	// on separate goroutine
+	gs, err := graphserver.NewGraphServer()
 	if err != nil {
 		panic(err.Error())
 	}
 
-	// create a server to manipulate graphs
-	gs, err := graphserver.NewGraphServer()
+	go gs.Startup()
+
+	// create our renderer with the server as the api
+	gr, err := graphrenderer.NewGraphRenderer(gs.Graphs)
+	if err != nil {
+		panic(err.Error())
+	}
 
 	for !gr.Finished {
 		gr.Frame()

@@ -1,0 +1,16 @@
+package graphproto;
+
+// go use cc_generic_services option
+option cc_generic_services = true;
+
+message NewGraphRequest {
+	required string name = 1;
+}
+
+message NewGraphResponse {
+	required int32 res = 1;
+}
+
+service GraphService {
+	rpc newgraph (NewGraphRequest) returns (NewGraphResponse);
+}
