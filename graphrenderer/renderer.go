@@ -1,7 +1,6 @@
 package graphrenderer
 
 import (
-	"../graph"
 	"errors"
 	"fmt"
 	gl "github.com/fcvarela/gl"
@@ -12,14 +11,13 @@ type GraphRenderer struct {
 	window           *glfw.Window
 	Finished         bool
 	GLContextVersion string
-	GraphList        *graph.GraphList
 }
 
 func errorCallback(err glfw.ErrorCode, desc string) {
 	fmt.Printf("%v: %v\n", err, desc)
 }
 
-func NewGraphRenderer(graphlist *graph.GraphList) (*GraphRenderer, error) {
+func NewGraphRenderer() (*GraphRenderer, error) {
 	glfw.SetErrorCallback(errorCallback)
 
 	if !glfw.Init() {
@@ -50,8 +48,8 @@ func NewGraphRenderer(graphlist *graph.GraphList) (*GraphRenderer, error) {
 
 	gr.window.MakeContextCurrent()
 	gr.GLContextVersion = gl.GetString(gl.VERSION)
+	fmt.Println(gr.GLContextVersion)
 	gr.Finished = false
-	gr.GraphList = graphlist
 
 	return &gr, nil
 }

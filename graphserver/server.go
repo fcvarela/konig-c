@@ -1,29 +1,17 @@
 package graphserver
 
 import (
-	"../graph"
-	"../graphproto.pb"
+	"bitbucket.org/fcvarela/konig/graphproto.pb"
 	"code.google.com/p/goprotobuf/proto"
 )
 
-type GraphServer struct {
-	Name   string
-	Graphs *graph.GraphList
-}
-
 type GraphService int
 
-func NewGraphServer() (*GraphServer, error) {
-	gs := GraphServer{}
-	gs.Graphs = graph.NewGraphList()
-	return &GraphServer{}, nil
-}
-
-func (gs *GraphServer) Startup() {
+func Startup() {
 	graphproto.ListenAndServeGraphService("tcp", ":1984", new(GraphService))
 }
 
-func (gs *GraphServer) Shutdown() {
+func Shutdown() {
 
 }
 
