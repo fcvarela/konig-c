@@ -1,14 +1,13 @@
 package main
 
 import (
-	"bitbucket.org/fcvarela/konig/graph"
 	"bitbucket.org/fcvarela/konig/graphproto.pb"
 	"code.google.com/p/goprotobuf/proto"
 	"fmt"
 	"log"
 )
 
-func testprotorpcclient() {
+func main() {
 	fmt.Println("Starting")
 	stub, client, err := graphproto.DialGraphService("tcp", "127.0.0.1:1984")
 	if err != nil {
@@ -16,41 +15,43 @@ func testprotorpcclient() {
 	}
 	defer client.Close()
 
-	var args graphproto.NewGraphRequest
-	var reply graphproto.NewGraphResponse
+	// create one graph
+	var args graphproto.GraphRequest
+	var reply graphproto.GraphResponse
 
-	for i := 0; i < 10000; i++ {
-		args.Name = proto.String("hello, world")
-		if err = stub.Newgraph(&args, &reply); err != nil {
-			log.Fatal("graphproto error:", err)
-		}
-		if i%1000 == 0 {
-			fmt.Printf("Result: (%s)=%d\n", args.GetName(), reply.GetRes())
-		}
+	if err = stub.AddGraph(&args, &reply); err != nil {
+		log.Fatal("Could not create graph:", err)
 	}
-}
 
-func testgraphapiclient() {
-	graph_id, err := graph.AddGraph()
-	if err != nil {
-		panic(err.Error())
-	}
+	graph_id := reply.GetObjId()
+
+	// add vertices and edges
+	var req graphproto.GraphRequest
+	var resp graphproto.GraphResponse
 
 	var vertices []uint64
-	for j := 0; j < 10e6; j++ {
-		vid, err := graph.AddVertex(graph_id)
-		if err != nil {
-			panic(err.Error())
+	for j := 0; j < 1e5; j++ {
+		if j%1000 == 0 {
+			log.Println(j)
 		}
-		vertices = append(vertices, vid)
+		// prepare the args
+		req.ObjId1 = proto.Uint64(graph_id)
+
+		if err = stub.AddVertex(&req, &resp); err != nil {
+			log.Fatal("Could not add vertex:", err)
+		}
+
+		vertices = append(vertices, resp.GetObjId())
 	}
 
-	for j := 0; j < 10e6; j++ {
-		graph.AddEdge(graph_id, vertices[j], vertices[(j+1)%100])
+	for j := 0; j < 1e5; j++ {
+		if j%1000 == 0 {
+			log.Println(j)
+		}
+		req.ObjId2 = proto.Uint64(vertices[j])
+		req.ObjId3 = proto.Uint64(vertices[(j+1)%100])
+		if err = stub.AddEdge(&req, &resp); err != nil {
+			log.Fatal("Could not add edge:", err)
+		}
 	}
-}
-
-func main() {
-	// testprotorpcclient()
-	testgraphapiclient()
 }

@@ -3,14 +3,22 @@ package graphproto;
 // go use cc_generic_services option
 option cc_generic_services = true;
 
-message NewGraphRequest {
-	required string name = 1;
+// we use the same response object for everything
+message GraphResponse {
+    optional uint64 obj_id = 1;
 }
 
-message NewGraphResponse {
-	required int32 res = 1;
+message GraphRequest {
+    optional uint64 obj_id1 = 1;
+    optional uint64 obj_id2 = 2;
+    optional uint64 obj_id3 = 3;
 }
 
 service GraphService {
-	rpc newgraph (NewGraphRequest) returns (NewGraphResponse);
+    rpc add_graph (GraphRequest) returns (GraphResponse);
+    rpc add_vertex (GraphRequest) returns (GraphResponse);
+    rpc add_edge  (GraphRequest) returns (GraphResponse);
+    rpc delete_graph (GraphRequest) returns (GraphResponse);
+    rpc delete_vertex (GraphRequest) returns (GraphResponse);
+    rpc delete_edge (GraphRequest) returns (GraphResponse);
 }

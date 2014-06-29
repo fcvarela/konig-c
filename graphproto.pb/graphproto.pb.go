@@ -9,8 +9,8 @@ It is generated from these files:
 	graphproto.proto
 
 It has these top-level messages:
-	NewGraphRequest
-	NewGraphResponse
+	GraphResponse
+	GraphRequest
 */
 package graphproto
 
@@ -28,34 +28,51 @@ import protorpc "code.google.com/p/protorpc"
 var _ = proto.Marshal
 var _ = math.Inf
 
-type NewGraphRequest struct {
-	Name             *string `protobuf:"bytes,1,req,name=name" json:"name,omitempty"`
+// we use the same response object for everything
+type GraphResponse struct {
+	ObjId            *uint64 `protobuf:"varint,1,opt,name=obj_id" json:"obj_id,omitempty"`
 	XXX_unrecognized []byte  `json:"-"`
 }
 
-func (m *NewGraphRequest) Reset()         { *m = NewGraphRequest{} }
-func (m *NewGraphRequest) String() string { return proto.CompactTextString(m) }
-func (*NewGraphRequest) ProtoMessage()    {}
+func (m *GraphResponse) Reset()         { *m = GraphResponse{} }
+func (m *GraphResponse) String() string { return proto.CompactTextString(m) }
+func (*GraphResponse) ProtoMessage()    {}
 
-func (m *NewGraphRequest) GetName() string {
-	if m != nil && m.Name != nil {
-		return *m.Name
+func (m *GraphResponse) GetObjId() uint64 {
+	if m != nil && m.ObjId != nil {
+		return *m.ObjId
 	}
-	return ""
+	return 0
 }
 
-type NewGraphResponse struct {
-	Res              *int32 `protobuf:"varint,1,req,name=res" json:"res,omitempty"`
-	XXX_unrecognized []byte `json:"-"`
+type GraphRequest struct {
+	ObjId1           *uint64 `protobuf:"varint,1,opt,name=obj_id1" json:"obj_id1,omitempty"`
+	ObjId2           *uint64 `protobuf:"varint,2,opt,name=obj_id2" json:"obj_id2,omitempty"`
+	ObjId3           *uint64 `protobuf:"varint,3,opt,name=obj_id3" json:"obj_id3,omitempty"`
+	XXX_unrecognized []byte  `json:"-"`
 }
 
-func (m *NewGraphResponse) Reset()         { *m = NewGraphResponse{} }
-func (m *NewGraphResponse) String() string { return proto.CompactTextString(m) }
-func (*NewGraphResponse) ProtoMessage()    {}
+func (m *GraphRequest) Reset()         { *m = GraphRequest{} }
+func (m *GraphRequest) String() string { return proto.CompactTextString(m) }
+func (*GraphRequest) ProtoMessage()    {}
 
-func (m *NewGraphResponse) GetRes() int32 {
-	if m != nil && m.Res != nil {
-		return *m.Res
+func (m *GraphRequest) GetObjId1() uint64 {
+	if m != nil && m.ObjId1 != nil {
+		return *m.ObjId1
+	}
+	return 0
+}
+
+func (m *GraphRequest) GetObjId2() uint64 {
+	if m != nil && m.ObjId2 != nil {
+		return *m.ObjId2
+	}
+	return 0
+}
+
+func (m *GraphRequest) GetObjId3() uint64 {
+	if m != nil && m.ObjId3 != nil {
+		return *m.ObjId3
 	}
 	return 0
 }
@@ -64,7 +81,12 @@ func init() {
 }
 
 type GraphService interface {
-	Newgraph(in *NewGraphRequest, out *NewGraphResponse) error
+	AddGraph(in *GraphRequest, out *GraphResponse) error
+	AddVertex(in *GraphRequest, out *GraphResponse) error
+	AddEdge(in *GraphRequest, out *GraphResponse) error
+	DeleteGraph(in *GraphRequest, out *GraphResponse) error
+	DeleteVertex(in *GraphRequest, out *GraphResponse) error
+	DeleteEdge(in *GraphRequest, out *GraphResponse) error
 }
 
 // AcceptGraphServiceClient accepts connections on the listener and serves requests
@@ -136,8 +158,23 @@ func NewGraphServiceClient(conn io.ReadWriteCloser) (*GraphServiceClient, *rpc.C
 	return &GraphServiceClient{c}, c
 }
 
-func (c *GraphServiceClient) Newgraph(in *NewGraphRequest, out *NewGraphResponse) error {
-	return c.Call("GraphService.Newgraph", in, out)
+func (c *GraphServiceClient) AddGraph(in *GraphRequest, out *GraphResponse) error {
+	return c.Call("GraphService.AddGraph", in, out)
+}
+func (c *GraphServiceClient) AddVertex(in *GraphRequest, out *GraphResponse) error {
+	return c.Call("GraphService.AddVertex", in, out)
+}
+func (c *GraphServiceClient) AddEdge(in *GraphRequest, out *GraphResponse) error {
+	return c.Call("GraphService.AddEdge", in, out)
+}
+func (c *GraphServiceClient) DeleteGraph(in *GraphRequest, out *GraphResponse) error {
+	return c.Call("GraphService.DeleteGraph", in, out)
+}
+func (c *GraphServiceClient) DeleteVertex(in *GraphRequest, out *GraphResponse) error {
+	return c.Call("GraphService.DeleteVertex", in, out)
+}
+func (c *GraphServiceClient) DeleteEdge(in *GraphRequest, out *GraphResponse) error {
+	return c.Call("GraphService.DeleteEdge", in, out)
 }
 
 // DialGraphService connects to an GraphService at the specified network address.
