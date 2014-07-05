@@ -1,15 +1,22 @@
+#ifndef KONIG_H
+#define KONIG_H
+
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C"
+#endif
 
-// zero values mean deleted and waiting for periodic reallocation (shrink, etc)
-// we need underlying array storage types to make sure contents are in chunks
-// of sequential memory. that means they can be drawn efficiently
-typedef struct {
-    uint64_t id;
-    uint64_t *adjacency_list;
-} konig_vertex_t;
+uint8_t konig_bootstrap(void);
+uint8_t konig_shutdown(void);
+uint8_t konig_done(void);
+uint8_t konig_update(void);
+uint8_t konig_draw(void);
 
-typedef struct {
-    uint64_t id;
-    konig_vertex_t *vertices;
-} konig_graph_t;
+uint32_t konig_add_graph(void);
+uint32_t konig_graph_add_vertex(uint32_t graph_id);
+uint8_t konig_graph_delete_vertex(uint32_t graph_id, uint32_t vertex_id);
+uint32_t konig_graph_add_edge(uint32_t graph_id, uint32_t vertex_id, uint32_t vertex_id2);
+uint8_t konig_graph_delete_edge(uint32_t edge_id);
+
+#endif
