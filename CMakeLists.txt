@@ -16,22 +16,47 @@ add_definitions(-DKONIG_VERSION="${KONIG_VERSION_MAJOR}.${KONIG_VERSION_MINOR}")
 # Append the source files here
 list (APPEND KONIG_SOURCES
   src/konig.cpp
-  src/Graph.cpp
+  src/DrawableGraph.cpp
   src/GraphRenderer.cpp
-  )
+)
 
 # Append the header files here
 list (APPEND KONIG_INCLUDE_FILES
   src/konig.h
-  )
+)
+
 
 # Create a shared lib
 add_library (konig_core OBJECT ${KONIG_SOURCES})
 add_library (${KONIG_LIBRARY_NAME} SHARED $<TARGET_OBJECTS:konig_core>)
 
+
+# GLFW + GLEW Deps
+find_package(PkgConfig REQUIRED)
+find_package(OpenGL)
+find_package(GLU)
+
+pkg_search_module(GLFW REQUIRED glfw3)
+pkg_search_module(GLEW REQUIRED glew)
+
+include_directories(${GLFW_INCLUDE_DIRS})
+include_directories(${GLEW_INCLUDE_DIRS})
+include_directories(${OPENGL_INCLUDE_DIR})
+
+link_directories(${GLEW_LIBRARY_DIRS})
+link_directories(${GLFW_LIBRARY_DIRS})
+link_directories(${OPENGL_LIBRARIES})
+
+# Linking
+target_link_libraries(${KONIG_LIBRARY_NAME} ${EXTRA_LIBS})
+target_link_libraries(${KONIG_LIBRARY_NAME} ${GLEW_LIBRARY})
+target_link_libraries(${KONIG_LIBRARY_NAME} ${GLFW_LIBRARIES})
+target_link_libraries(${KONIG_LIBRARY_NAME} ${OPENGL_LIBRARIES})
+target_link_libraries(${KONIG_LIBRARY_NAME} ${OPENGL_glu_LIBRARY})
+
 SET_TARGET_PROPERTIES(${KONIG_LIBRARY_NAME} PROPERTIES
-                                             VERSION ${KONIG_VERSION_MAJOR}.${KONIG_VERSION_MINOR}
-                                             SOVERSION ${KONIG_VERSION_MAJOR})
+                                            VERSION ${KONIG_VERSION_MAJOR}.${KONIG_VERSION_MINOR}
+                                            SOVERSION ${KONIG_VERSION_MAJOR})
 
 set(KONIG_LIB_INSTALL_DIR "")
 if(DEFINED ENV{KONIG_LIB_ARCH})
@@ -42,4 +67,3 @@ endif()
 
 INSTALL ( TARGETS ${KONIG_LIBRARY_NAME} DESTINATION ${KONIG_LIB_INSTALL_DIR})
 INSTALL ( FILES ${KONIG_INCLUDE_FILES} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/lib${KONIG_LIBRARY_NAME})
-

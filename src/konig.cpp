@@ -3,13 +3,13 @@
 
 #include <map>
 
-#include "Graph.h"
+#include "DrawableGraph.h"
 #include "GraphRenderer.h"
 
 using namespace konig;
 
 // global graph list for now
-std::map<uint32_t, Graph*> konig_graph_list;
+std::map<uint32_t, DrawableGraph*> konig_graph_list;
 
 // global renderer
 GraphRenderer *konig_renderer;
@@ -35,24 +35,23 @@ uint8_t konig_bootstrap(void) {
 }
 
 void konig_shutdown(void) {
-
+    delete konig_renderer;
 }
 
 uint8_t konig_done(void) {
-    return 0;
-
+    return konig_renderer->done();
 }
 
 uint8_t konig_update(void) {
-    return 1;
+    return konig_renderer->update(&konig_graph_list);
 }
 
 uint8_t konig_draw(void) {
-    return 1;
+    return konig_renderer->draw(&konig_graph_list);
 }
 
 uint32_t konig_add_graph(void) {
-    konig_graph_list[++konig_graphcount] = new Graph();
+    konig_graph_list[++konig_graphcount] = new DrawableGraph();
     return konig_graphcount;
 }
 
