@@ -2,6 +2,8 @@
 
 #include "Graph.h"
 
+namespace konig {
+
 Graph::Graph() {
 
 }
@@ -44,4 +46,6 @@ bool Graph::delete_vertex(uint32_t vertex_idx) {
 bool Graph::delete_edge(uint32_t edge_idx) {
     this->edge_array[edge_idx].active = 0;
     return true;
+}
+
 }

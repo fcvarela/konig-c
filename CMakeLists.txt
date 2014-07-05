@@ -17,6 +17,7 @@ add_definitions(-DKONIG_VERSION="${KONIG_VERSION_MAJOR}.${KONIG_VERSION_MINOR}")
 list (APPEND KONIG_SOURCES
   src/konig.cpp
   src/Graph.cpp
+  src/GraphRenderer.cpp
   )
 
 # Append the header files here
