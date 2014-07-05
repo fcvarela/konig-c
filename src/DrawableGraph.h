@@ -32,12 +32,11 @@ typedef struct {
 // list/set w/ pointers to actual data
 
 class DrawableGraph {
-private:
+public:
     // pure vector storage for position computing and drawing
     std::vector<vertex_t> vertex_array;
     std::vector<edge_t> edge_array;
-
-public:
+    
     DrawableGraph();
     ~DrawableGraph();
 

@@ -68,26 +68,21 @@ bool GraphRenderer::update(std::map<uint32_t, DrawableGraph*> *graph_list) {
 
 bool GraphRenderer::draw(std::map<uint32_t, DrawableGraph*> *graph_list) {
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+    glPointSize(4.0);
     
     glLoadIdentity();
-    glTranslatef(0.0, 0.0, -2.0);
-    glRotatef((float) glfwGetTime() * 50.f, 0.f, 0.f, 1.f);
+    glTranslatef(0.0, 0.0, -3.0);
     
-    glBegin(GL_QUADS);
-    
-    glColor3f(1.f, 0.f, 0.f);
-    glVertex3f(-0.5f, -0.5f, 0.f);
-    
-    glColor3f(0.f, 1.f, 0.f);
-    glVertex3f(0.5f, -0.5f, 0.f);
-    
-    glColor3f(0.f, 0.f, 1.f);
-    glVertex3f(0.5f, 0.5f, 0.f);
+    glEnableClientState(GL_VERTEX_ARRAY);
 
-    glColor3f(0.f, 1.f, 1.f);
-    glVertex3f(-0.5f, 0.5f, 0.f);
-    
-    glEnd();
+    std::map<uint32_t, DrawableGraph *>::iterator iter;
+    for (iter = graph_list->begin(); iter != graph_list->end(); iter++) {
+        DrawableGraph *graph = iter->second;
+        glVertexPointer(3, GL_FLOAT, sizeof(graph->vertex_array[0]), (float *)&graph->vertex_array[0].x);
+        glDrawArrays(GL_POINTS, 0, graph->vertex_array.size());
+    }
+
+    glDisableClientState(GL_VERTEX_ARRAY);
     
     glfwSwapBuffers(window);
     return true;

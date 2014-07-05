@@ -17,10 +17,10 @@ uint32_t DrawableGraph::add_vertex() {
 
     newvertex.active = 1;
 
-    // randomize starting position
-    newvertex.x = (float)(rand()) / (float)(RAND_MAX);
-    newvertex.y = (float)(rand()) / (float)(RAND_MAX);
-    newvertex.z = (float)(rand()) / (float)(RAND_MAX);
+    // randomize starting position (-1 to 1)
+    newvertex.x = (float)(rand()) / (float)(RAND_MAX/2.0) - 1.0;
+    newvertex.y = (float)(rand()) / (float)(RAND_MAX/2.0) - 1.0;
+    newvertex.z = (float)(rand()) / (float)(RAND_MAX/2.0) - 1.0;
 
     this->vertex_array.push_back(newvertex);
     size_t vas = this->vertex_array.size() - 1;
