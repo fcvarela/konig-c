@@ -11,7 +11,8 @@ DrawableGraph::DrawableGraph() {
 
     solver = new ParticleSolver();
 
-    glGenBuffers(1, &this->vbo);
+    glGenBuffers(1, &this->vbo_in);
+    glGenBuffers(1, &this->vbo_out);
 }
 
 DrawableGraph::~DrawableGraph() {
@@ -21,29 +22,29 @@ DrawableGraph::~DrawableGraph() {
 void DrawableGraph::step(double dt) {
     // are we dirty?
     if (glfwGetTime() - this->last_update > 0.1 && this->dirty) {
+        // copy from out into vertex_array!!!
         size_t byte_size = this->vertex_array.size() * sizeof(this->vertex_array[0]);
-        glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, this->vbo_in);
         glBufferData(GL_ARRAY_BUFFER, byte_size, &this->vertex_array[0], GL_DYNAMIC_DRAW);
+
+        glBindBuffer(GL_ARRAY_BUFFER, this->vbo_out);
+        glBufferData(GL_ARRAY_BUFFER, byte_size, &this->vertex_array[0], GL_DYNAMIC_DRAW);
+        
         this->buffer = &this->vertex_array[0];
-        this->element_count = this->vertex_array.size();
         this->inited = true;
         this->dirty = false;
+        this->element_count = this->vertex_array.size();
     }
 
-    // physical simulation step
-    for (size_t i=0; i<this->vertex_array.size(); i++) {
-        if (!this->vertex_array[i].active)
-            continue;
+    if (!this->inited)
+        return;
 
-        this->vertex_array[i].x += this->vertex_array[i].vx * dt;
-        this->vertex_array[i].y += this->vertex_array[i].vy * dt;
-        this->vertex_array[i].z += this->vertex_array[i].vz * dt;
-    }
+    solver->step(this->vbo_in, this->vbo_out, element_count, dt);
 
-    // update vbo w/ simulation step
-    size_t byte_size = this->vertex_array.size() * sizeof(this->vertex_array[0]);
-    glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, byte_size, &this->vertex_array[0]);
+    // swap the vbos
+    GLuint temp = this->vbo_in;
+    this->vbo_in = this->vbo_out;
+    this->vbo_out = temp;
 }
 
 uint32_t DrawableGraph::add_vertex() {

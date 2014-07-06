@@ -44,7 +44,7 @@ public:
     std::vector<vertex_t> vertex_array;
     std::vector<edge_t> edge_array;
     
-    GLuint vbo;
+    GLuint vbo_in, vbo_out;
 
     void *buffer;
     size_t element_count;

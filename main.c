@@ -5,7 +5,7 @@ int main(int argc, char **argv) {
     konig_bootstrap();
 
     uint32_t graph_id = konig_add_graph();
-    for (uint32_t i=0; i<10e3; i++) {
+    for (uint32_t i=0; i<512; i++) {
         konig_graph_add_vertex(graph_id);
     }
 
