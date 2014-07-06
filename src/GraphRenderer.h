@@ -13,6 +13,8 @@ namespace konig {
 class GraphRenderer {
 private:
     GLFWwindow *window;
+    double last_update;
+
 public:
     GraphRenderer();
     ~GraphRenderer();

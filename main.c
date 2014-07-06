@@ -9,9 +9,9 @@ int main(int argc, char **argv) {
         konig_graph_add_vertex(graph_id);
     }
 
-    for (uint32_t i=0; i<10e3-1; i++) {
-        konig_graph_add_edge(graph_id, i, i+1);
-    }
+    // for (uint32_t i=0; i<10e4-1; i++) {
+    //     konig_graph_add_edge(graph_id, i, i+1);
+    // }
 
     while (!konig_done()) {
         konig_update();

@@ -26,7 +26,7 @@ void GraphRenderer::reshape_callback(GLFWwindow *window, int width, int height) 
     glLoadIdentity();
 
     // make sure we take into account expanding the box (10.0->whatever bounding sphere diameter is)
-    GraphRenderer::set_perspective(60.0, (GLfloat)width/(GLfloat)height, 1.0, 10.0);
+    GraphRenderer::set_perspective(60.0, (GLfloat)width/(GLfloat)height, 1.0, 100.0);
 
     // setup modelview
     glMatrixMode(GL_MODELVIEW);
@@ -45,9 +45,12 @@ GraphRenderer::GraphRenderer() {
         exit(EXIT_FAILURE);
     }
 
+    this->last_update = glfwGetTime();
+
     glfwMakeContextCurrent(this->window);
     glfwSetKeyCallback(this->window, GraphRenderer::key_callback);
     glfwSetFramebufferSizeCallback(this->window, GraphRenderer::reshape_callback);
+    glfwSwapInterval(1);
 
     GraphRenderer::reshape_callback(this->window, 1280, 800);
 }
@@ -62,24 +65,42 @@ bool GraphRenderer::done() {
 }
 
 bool GraphRenderer::update(std::map<uint32_t, DrawableGraph*> *graph_list) {
+    double dt = glfwGetTime() - this->last_update;
+
+    std::map<uint32_t, DrawableGraph *>::iterator iter;
+    for (iter = graph_list->begin(); iter != graph_list->end(); iter++) {
+        DrawableGraph *graph = iter->second;
+        graph->step(dt);
+    }
+
     glfwPollEvents();
+
+    this->last_update = glfwGetTime();
     return true;
 }
 
 bool GraphRenderer::draw(std::map<uint32_t, DrawableGraph*> *graph_list) {
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-    glPointSize(4.0);
+    glPointSize(1.0);
+    glEnable(GL_POINT_SMOOTH);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     
     glLoadIdentity();
-    glTranslatef(0.0, 0.0, -3.0);
+    glTranslatef(0.0, 0.0, -10.0);
     
     glEnableClientState(GL_VERTEX_ARRAY);
 
     std::map<uint32_t, DrawableGraph *>::iterator iter;
     for (iter = graph_list->begin(); iter != graph_list->end(); iter++) {
         DrawableGraph *graph = iter->second;
-        glVertexPointer(3, GL_FLOAT, sizeof(graph->vertex_array[0]), (float *)&graph->vertex_array[0].x);
-        glDrawArrays(GL_POINTS, 0, graph->vertex_array.size());
+        if (!graph->inited)
+            continue;
+
+        glBindBuffer(GL_ARRAY_BUFFER, graph->vbo);
+        glVertexPointer(3, GL_FLOAT, sizeof(vertex_t), (char *)NULL + 4); // size of first element
+        glDrawArrays(GL_POINTS, 0, graph->element_count);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
     glDisableClientState(GL_VERTEX_ARRAY);

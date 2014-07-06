@@ -2,6 +2,8 @@ cmake_minimum_required (VERSION 2.8.8)
 
 project(konig)
 
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
 set(KONIG_LIBRARY_NAME "konig")
 
 set(KONIG_VERSION_MAJOR 0)
@@ -18,6 +20,7 @@ list (APPEND KONIG_SOURCES
   src/konig.cpp
   src/DrawableGraph.cpp
   src/GraphRenderer.cpp
+  src/ParticleSolver.cpp
 )
 
 # Append the header files here
@@ -33,8 +36,8 @@ add_library (${KONIG_LIBRARY_NAME} SHARED $<TARGET_OBJECTS:konig_core>)
 
 # GLFW + GLEW Deps
 find_package(PkgConfig REQUIRED)
-find_package(OpenGL)
-find_package(GLU)
+find_package(OpenGL REQUIRED)
+find_package(OpenCL REQUIRED)
 
 pkg_search_module(GLFW REQUIRED glfw3)
 pkg_search_module(GLEW REQUIRED glew)
@@ -42,17 +45,19 @@ pkg_search_module(GLEW REQUIRED glew)
 include_directories(${GLFW_INCLUDE_DIRS})
 include_directories(${GLEW_INCLUDE_DIRS})
 include_directories(${OPENGL_INCLUDE_DIR})
+include_directories(${OPENCL_INCLUDE_DIR})
 
 link_directories(${GLEW_LIBRARY_DIRS})
 link_directories(${GLFW_LIBRARY_DIRS})
 link_directories(${OPENGL_LIBRARIES})
+link_directories(${OPENCL_LIBRARIES})
 
 # Linking
 target_link_libraries(${KONIG_LIBRARY_NAME} ${EXTRA_LIBS})
 target_link_libraries(${KONIG_LIBRARY_NAME} ${GLEW_LIBRARY})
 target_link_libraries(${KONIG_LIBRARY_NAME} ${GLFW_LIBRARIES})
 target_link_libraries(${KONIG_LIBRARY_NAME} ${OPENGL_LIBRARIES})
-target_link_libraries(${KONIG_LIBRARY_NAME} ${OPENGL_glu_LIBRARY})
+target_link_libraries(${KONIG_LIBRARY_NAME} ${OPENCL_LIBRARIES})
 
 SET_TARGET_PROPERTIES(${KONIG_LIBRARY_NAME} PROPERTIES
                                             VERSION ${KONIG_VERSION_MAJOR}.${KONIG_VERSION_MINOR}

@@ -4,6 +4,10 @@
 #include <vector>
 #include <stdint.h>
 
+#include <GLFW/glfw3.h>
+
+#include "ParticleSolver.h"
+
 namespace konig {
 
 // for pure sequential memory (draw as vbo fast)
@@ -15,6 +19,7 @@ typedef struct {
     float vx;
     float vy;
     float vz;
+    float dummy;
 } vertex_t;
 
 // for pure sequential memory (draw as vbo fast)
@@ -32,14 +37,27 @@ typedef struct {
 // list/set w/ pointers to actual data
 
 class DrawableGraph {
+private:
+    double last_update;
 public:
     // pure vector storage for position computing and drawing
     std::vector<vertex_t> vertex_array;
     std::vector<edge_t> edge_array;
     
+    GLuint vbo;
+
+    void *buffer;
+    size_t element_count;
+    bool dirty;
+
+    bool inited;
+
+    ParticleSolver *solver;
+    
     DrawableGraph();
     ~DrawableGraph();
 
+    void step(double dt);
     uint32_t add_vertex();
     uint32_t add_edge(uint32_t vertex_idx1, uint32_t vertex_idx2);
     bool delete_vertex(uint32_t vertex_idx);
