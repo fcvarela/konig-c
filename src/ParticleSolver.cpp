@@ -16,6 +16,7 @@ ParticleSolver::ParticleSolver() {
         "__kernel void vertex_step(__global vertex_t *in, __global vertex_t *out, const float dt) {\n",
         "    int id = get_global_id(0);\n",
         "    out[id].pos = in[id].pos + in[id].vel * dt;\n",
+        "    out[id].vel = in[id].vel;\n",
         "}\n"
     };
 
