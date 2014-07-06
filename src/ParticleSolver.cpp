@@ -16,6 +16,8 @@ ParticleSolver::ParticleSolver() {
         "__kernel void vertex_step(__global vertex_t *in, __global vertex_t *out, const float dt) {\n",
         "    int id = get_global_id(0);\n",
         "    out[id].pos = in[id].pos + in[id].vel * dt;\n",
+        "    out[id].vel = in[id].vel;\n",
+        "    out[id].active = in[id].active;\n",
         "}\n"
     };
 
@@ -68,32 +70,37 @@ ParticleSolver::ParticleSolver() {
 }
 
 ParticleSolver::~ParticleSolver() {
-    clReleaseMemObject(this->cl_vbo_in);
-    clReleaseMemObject(this->cl_vbo_in);
     clReleaseKernel(this->kernel);
     clReleaseProgram(program);
     clReleaseContext(context);
 }
 
-void ParticleSolver::step(GLuint vbo_in, GLuint vbo_out, size_t element_count, float dt) {
-    glFinish();
-    this->cl_vbo_in = clCreateFromGLBuffer(this->context, CL_MEM_READ_ONLY, vbo_in, NULL);
-    this->cl_vbo_out = clCreateFromGLBuffer(this->context, CL_MEM_WRITE_ONLY, vbo_out, NULL);
+void ParticleSolver::step(std::vector<vertex_t>&vertex_array, float dt) {
+    // allocate buffers
+    size_t data_size = sizeof(vertex_t) * vertex_array.size();
+    cl_mem input_buffer = clCreateBuffer(this->context, CL_MEM_READ_ONLY, data_size, NULL, NULL);
+    cl_mem output_buffer = clCreateBuffer(this->context, CL_MEM_READ_ONLY, data_size, NULL, NULL);
 
-    clEnqueueAcquireGLObjects(this->queue, 1, &this->cl_vbo_in, 0, 0, 0);
-    clEnqueueAcquireGLObjects(this->queue, 1, &this->cl_vbo_out, 0, 0, 0);
+    // schedule vertex_array -> input_buffer
+    clEnqueueWriteBuffer(queue, input_buffer, CL_TRUE, 0, vertex_array.size()*sizeof(vertex_t), &vertex_array[0], 0, NULL, NULL);
 
-    clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&this->cl_vbo_in);
-    clSetKernelArg(kernel, 1, sizeof(cl_mem), (void *)&this->cl_vbo_out);
+    // set kernel args
+    clSetKernelArg(kernel, 0, sizeof(cl_mem), &input_buffer);
+    clSetKernelArg(kernel, 1, sizeof(cl_mem), &output_buffer);
     clSetKernelArg(kernel, 2, sizeof(float), &dt);
 
-    size_t global_work_size = 128;
+    // schedule the kernel
+    size_t global_work_size = vertex_array.size();
+    cl_event kernel_completion;
+    clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &global_work_size, NULL, 0, 0, &kernel_completion);
+    clWaitForEvents(1, &kernel_completion);
+    clReleaseEvent(kernel_completion);
 
-    clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &global_work_size, NULL, 0, 0, 0);
+    clEnqueueReadBuffer(queue, output_buffer, CL_TRUE, 0, vertex_array.size()*sizeof(vertex_t), &vertex_array[0], 0, NULL, NULL);
 
-    clEnqueueReleaseGLObjects(queue, 1, &this->cl_vbo_in, 0, 0, 0);
-    clEnqueueReleaseGLObjects(queue, 1, &this->cl_vbo_out, 0, 0, 0);
-    clFinish(queue);
+    // read memory back
+    clReleaseMemObject(input_buffer);
+    clReleaseMemObject(output_buffer);
 }
 
 }

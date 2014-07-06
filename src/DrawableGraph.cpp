@@ -1,6 +1,7 @@
 #include <stdlib.h>
 
 #include "DrawableGraph.h"
+#include "ParticleSolver.h"
 
 namespace konig {
 
@@ -10,9 +11,6 @@ DrawableGraph::DrawableGraph() {
     this->dirty = false;
 
     solver = new ParticleSolver();
-
-    glGenBuffers(1, &this->vbo_in);
-    glGenBuffers(1, &this->vbo_out);
 }
 
 DrawableGraph::~DrawableGraph() {
@@ -22,14 +20,7 @@ DrawableGraph::~DrawableGraph() {
 void DrawableGraph::step(double dt) {
     // are we dirty?
     if (glfwGetTime() - this->last_update > 0.1 && this->dirty) {
-        // copy from out into vertex_array!!!
         size_t byte_size = this->vertex_array.size() * sizeof(this->vertex_array[0]);
-        glBindBuffer(GL_ARRAY_BUFFER, this->vbo_in);
-        glBufferData(GL_ARRAY_BUFFER, byte_size, &this->vertex_array[0], GL_DYNAMIC_DRAW);
-
-        glBindBuffer(GL_ARRAY_BUFFER, this->vbo_out);
-        glBufferData(GL_ARRAY_BUFFER, byte_size, &this->vertex_array[0], GL_DYNAMIC_DRAW);
-        
         this->buffer = &this->vertex_array[0];
         this->inited = true;
         this->dirty = false;
@@ -39,12 +30,7 @@ void DrawableGraph::step(double dt) {
     if (!this->inited)
         return;
 
-    solver->step(this->vbo_in, this->vbo_out, element_count, dt);
-
-    // swap the vbos
-    GLuint temp = this->vbo_in;
-    this->vbo_in = this->vbo_out;
-    this->vbo_out = temp;
+    solver->step(this->vertex_array, dt);
 }
 
 uint32_t DrawableGraph::add_vertex() {

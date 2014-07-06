@@ -25,6 +25,7 @@
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
 
+#include "Vertex.h"
 
 namespace konig {
 
@@ -37,12 +38,10 @@ public:
     cl_program program;
     cl_kernel kernel;
 
-    cl_mem cl_vbo_in, cl_vbo_out;
-
     ParticleSolver();
     ~ParticleSolver();
 
-    void step(GLuint vbo_in, GLuint vbo_out, size_t element_count, float dt);
+    void step(std::vector<vertex_t>& array, float dt);
 };
 
 }
