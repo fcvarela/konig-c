@@ -9,18 +9,13 @@ ParticleSolver::ParticleSolver() {
         "typedef struct {\n",
         "    float3 pos;\n",
         "    float3 vel;\n",
-        "    uint active;\n",
-        "    uint dummy;\n",
         "} vertex_t;\n",
         "\n",
         "__kernel void vertex_step(__global vertex_t *in, __global vertex_t *out, const float dt) {\n",
         "    int id = get_global_id(0);\n",
         "\n",
-        "    __global vertex_t *v_in = &in[id];"
-        "    out[id].pos = v_in->pos + v_in->vel * dt;\n",
-        "    out[id].vel = v_in->vel;\n",
-        "    out[id].active = v_in->active;\n",
-        "    out[id].dummy = v_in->dummy;\n",
+        "    out[id].pos = in[id].pos + in[id].vel * dt;\n",
+        "    out[id].vel = in[id].vel;\n",
         "}\n"
     };
 
@@ -85,21 +80,21 @@ void ParticleSolver::step(std::vector<vertex_t>&vertex_array, float dt) {
     cl_mem output_buffer = clCreateBuffer(this->context, CL_MEM_WRITE_ONLY, data_size, NULL, NULL);
 
     // schedule vertex_array -> input_buffer
-    clEnqueueWriteBuffer(queue, input_buffer, CL_TRUE, 0, vertex_array.size()*sizeof(vertex_t), (void *)&vertex_array[0], 0, NULL, NULL);
+    clEnqueueWriteBuffer(queue, input_buffer, CL_TRUE, 0, data_size, (void *)&vertex_array[0], 0, NULL, NULL);
 
     // set kernel args
     clSetKernelArg(kernel, 0, sizeof(cl_mem), &input_buffer);
     clSetKernelArg(kernel, 1, sizeof(cl_mem), &output_buffer);
     clSetKernelArg(kernel, 2, sizeof(float), &dt);
 
-    // schedule the kernel
+    // optimal sizes
     size_t global_work_size = vertex_array.size();
     cl_event kernel_completion;
-    clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &global_work_size, NULL, 0, 0, &kernel_completion);
+    clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &global_work_size, NULL, 0, NULL, &kernel_completion);
     clWaitForEvents(1, &kernel_completion);
     clReleaseEvent(kernel_completion);
 
-    clEnqueueReadBuffer(queue, output_buffer, CL_TRUE, 0, vertex_array.size()*sizeof(vertex_t), (void *)&vertex_array[0], 0, NULL, NULL);
+    clEnqueueReadBuffer(queue, output_buffer, CL_TRUE, 0, data_size, (void *)&vertex_array[0], 0, NULL, NULL);
 
     // read memory back
     clReleaseMemObject(input_buffer);
