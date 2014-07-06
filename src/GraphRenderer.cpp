@@ -97,7 +97,7 @@ bool GraphRenderer::draw(std::map<uint32_t, DrawableGraph*> *graph_list) {
         if (!graph->inited)
             continue;
 
-        glVertexPointer(3, GL_FLOAT, sizeof(vertex_t), &graph->vertex_array[0].x);
+        glVertexPointer(3, GL_FLOAT, sizeof(vertex_t), &graph->vertex_array[0]);
         glDrawArrays(GL_POINTS, 0, graph->element_count);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }

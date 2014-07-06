@@ -5,14 +5,10 @@ namespace konig {
 
 // for pure sequential memory (draw as vbo fast)
 typedef struct {
+    float pos[3];
+    float vel[3];
     uint32_t active;
-    float x;
-    float y;
-    float z;
-    float vx;
-    float vy;
-    float vz;
-    float dummy;
+    uint32_t dummy;
 } vertex_t;
 
 // for pure sequential memory (draw as vbo fast)
