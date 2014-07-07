@@ -14,7 +14,7 @@ class GraphRenderer {
 private:
     GLFWwindow *window;
     double last_update;
-    double last_draw;
+    GLuint point_texture;
 
 public:
     GraphRenderer();

@@ -38,11 +38,13 @@ public:
     cl_program program;
     cl_kernel kernel;
 
+    cl_mem cl_vbo_in, cl_vbo_out;
+
     ParticleSolver();
     ~ParticleSolver();
 
     void pick_device();
-    void step(std::vector<vertex_t>& array, float dt);
+    void step(GLuint vbo_in, GLuint vbo_out, size_t element_count, float dt);
 };
 
 }

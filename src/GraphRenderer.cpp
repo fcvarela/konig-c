@@ -1,5 +1,6 @@
 #include <math.h>
 #include <stdlib.h>
+#include <SOIL.h>
 
 #include "GraphRenderer.h"
 
@@ -27,7 +28,7 @@ void GraphRenderer::reshape_callback(GLFWwindow *window, int width, int height) 
 
     // make sure we take into account expanding the box
     // (10.0->whatever bounding sphere diameter is)
-    GraphRenderer::set_perspective(60.0, (GLfloat)width/(GLfloat)height, 1.0, 100.0);
+    GraphRenderer::set_perspective(60.0, (GLfloat)width/(GLfloat)height, 1.0, 1000.0);
 
     // setup modelview
     glMatrixMode(GL_MODELVIEW);
@@ -40,21 +41,39 @@ GraphRenderer::GraphRenderer() {
         exit(EXIT_FAILURE);
     }
 
-    this->window = glfwCreateWindow(1280, 800, "Konig", NULL, NULL);
+    // request fullscreen
+    const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+    this->window = glfwCreateWindow(mode->width, mode->height, "Konig", glfwGetPrimaryMonitor(), NULL);
     if (!this->window) {
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
 
     this->last_update = glfwGetTime();
-    this->last_draw = glfwGetTime();
 
     glfwMakeContextCurrent(this->window);
     glfwSetKeyCallback(this->window, GraphRenderer::key_callback);
     glfwSetFramebufferSizeCallback(this->window, GraphRenderer::reshape_callback);
     glfwSwapInterval(1);
 
-    GraphRenderer::reshape_callback(this->window, 1280, 800);
+    // load texture here for now: needs refactoring
+    glGenTextures(1, &point_texture);
+    glBindTexture(GL_TEXTURE_2D, point_texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    point_texture = SOIL_load_OGL_texture("data/textures/particle.bmp", SOIL_LOAD_AUTO, point_texture, SOIL_FLAG_MIPMAPS);
+
+    glPointSize(10.0);
+    glTexEnvf(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
+    glEnable(GL_POINT_SPRITE);
+    // glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+    glEnable(GL_POINT_SMOOTH);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+    glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN, GL_LOWER_LEFT);
+    glEnable(GL_TEXTURE_2D);
+
+    GraphRenderer::reshape_callback(this->window, mode->width, mode->height);
 }
 
 GraphRenderer::~GraphRenderer() {
@@ -82,16 +101,10 @@ bool GraphRenderer::update(std::map<uint32_t, DrawableGraph*> *graph_list) {
 }
 
 bool GraphRenderer::draw(std::map<uint32_t, DrawableGraph*> *graph_list) {
-
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-    glPointSize(1.0);
-    glEnable(GL_POINT_SMOOTH);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    
     glLoadIdentity();
-    glTranslatef(0.0, 0.0, -10.0);
-    
+    glTranslatef(0.0, 0.0, -500.0);
+
     glEnableClientState(GL_VERTEX_ARRAY);
 
     std::map<uint32_t, DrawableGraph *>::iterator iter;
@@ -100,7 +113,8 @@ bool GraphRenderer::draw(std::map<uint32_t, DrawableGraph*> *graph_list) {
         if (!graph->inited)
             continue;
 
-        glVertexPointer(3, GL_FLOAT, sizeof(vertex_t), &graph->vertex_array[0]);
+        glBindBuffer(GL_ARRAY_BUFFER, graph->vbo_out);
+        glVertexPointer(3, GL_FLOAT, sizeof(vertex_t), 0);
         glDrawArrays(GL_POINTS, 0, graph->element_count);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
@@ -108,6 +122,5 @@ bool GraphRenderer::draw(std::map<uint32_t, DrawableGraph*> *graph_list) {
     glDisableClientState(GL_VERTEX_ARRAY);
     
     glfwSwapBuffers(window);
-    last_draw = glfwGetTime();
     return true;
 }

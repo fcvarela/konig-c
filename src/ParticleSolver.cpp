@@ -11,9 +11,18 @@ const char *cl_kernel_src[] = {
     "    float4 vel;\n",
     "};",
     "__kernel void vertex_step(__global struct Particle *in, __global struct Particle *out, const float dt) {\n",
-    "    int id = get_global_id(0);\n",
-    "    out[id].pos = in[id].pos + in[id].vel * dt;\n",
-    "    out[id].vel = in[id].vel;\n",
+    "   float4 acc = (float4)(0.0f, 0.0f, 0.0f, 0.0f);\n",
+    "   int total = get_global_size(0);\n",
+    "   int id = get_global_id(0);\n",
+    "   for (int i=0; i<total; i++) {\n",
+    "       float4 d = in[i].pos - in[id].pos;\n",
+    "       float invr = 1.0/sqrt(length(d)+0.0001);\n",
+    "       float invr3 = invr*invr*invr;\n",
+    "       float f = invr3;\n", // times mass if applicable
+    "       acc += f * d;\n",
+    "   }\n",
+    "   out[id].pos = in[id].pos + dt*in[id].vel + 0.5f*dt*dt*acc;\n",
+    "   out[id].vel = in[id].vel + acc * dt;\n",
     "}\n"
 };
 
@@ -74,7 +83,7 @@ void ParticleSolver::pick_device() {
             this->device = devices[j];
         }
     }
-    this->device = devices[2];
+    this->device = devices[1];
     free(devices);
 }
 
@@ -144,34 +153,21 @@ ParticleSolver::~ParticleSolver() {
     clReleaseContext(context);
 }
 
-void ParticleSolver::step(std::vector<vertex_t>&vertex_array, float dt) {
-    // allocate buffers
-    size_t data_size = sizeof(vertex_t) * vertex_array.size();
-    cl_mem input_buffer = clCreateBuffer(this->context, CL_MEM_READ_ONLY, data_size, NULL, NULL);
-    cl_mem output_buffer = clCreateBuffer(this->context, CL_MEM_WRITE_ONLY, data_size, NULL, NULL);
+void ParticleSolver::step(GLuint vbo_in, GLuint vbo_out, size_t element_count, float dt) {
+    this->cl_vbo_in = clCreateFromGLBuffer(this->context, CL_MEM_READ_ONLY, vbo_in, NULL);
+    this->cl_vbo_out = clCreateFromGLBuffer(this->context, CL_MEM_WRITE_ONLY, vbo_out, NULL);
 
-    // schedule vertex_array -> input_buffer
-    clEnqueueWriteBuffer(queue, input_buffer, CL_TRUE, 0, data_size, (void *)&vertex_array[0], 0, NULL, NULL);
-    clFinish(queue);
+    clEnqueueAcquireGLObjects(this->queue, 1, &this->cl_vbo_in, 0, 0, 0);
+    clEnqueueAcquireGLObjects(this->queue, 1, &this->cl_vbo_out, 0, 0, 0);
 
     // set kernel args
-    clSetKernelArg(kernel, 0, sizeof(cl_mem), &input_buffer);
-    clSetKernelArg(kernel, 1, sizeof(cl_mem), &output_buffer);
+    clSetKernelArg(kernel, 0, sizeof(cl_mem), (void *)&this->cl_vbo_in);
+    clSetKernelArg(kernel, 1, sizeof(cl_mem), (void *)&this->cl_vbo_out);
     clSetKernelArg(kernel, 2, sizeof(float), &dt);
     
     // schedule the kernel
-    size_t global_work_size = vertex_array.size();
-    cl_event kernel_completion;
-    cl_int status = clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &global_work_size, NULL, 0, NULL, &kernel_completion);
-    if (status != CL_SUCCESS) {
-        fprintf(stderr, "clCreateProgramWithSource: %s\n", get_error_string(status));
-        exit(1);
-    }
-    clWaitForEvents(1, &kernel_completion);
-    clReleaseEvent(kernel_completion);
-
-    // read memory back
-    clEnqueueReadBuffer(queue, output_buffer, CL_TRUE, 0, data_size, (void *)&vertex_array[0], 0, NULL, NULL);
-    clReleaseMemObject(input_buffer);
-    clReleaseMemObject(output_buffer);
+    cl_int status = clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &element_count, NULL, 0, 0, 0);
+    
+    clEnqueueReleaseGLObjects(queue, 1, &this->cl_vbo_in, 0, 0, 0);
+    clEnqueueReleaseGLObjects(queue, 1, &this->cl_vbo_out, 0, 0, 0);
 }

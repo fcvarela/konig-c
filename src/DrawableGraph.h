@@ -27,10 +27,10 @@ public:
     std::vector<vertex_t> vertex_array;
     std::vector<edge_t> edge_array;
 
-    void *buffer;
+    GLuint vbo_in, vbo_out;
+
     size_t element_count;
     bool dirty;
-
     bool inited;
 
     ParticleSolver *solver;
