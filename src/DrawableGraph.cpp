@@ -50,16 +50,14 @@ void DrawableGraph::step(double dt) {
 uint32_t DrawableGraph::add_vertex() {
     vertex_t newvertex;
 
-    newvertex.active = 1;
-
     // randomize starting position (-1 to 1)
-    newvertex.x = (float)(rand()) / (float)(RAND_MAX/2.0) - 1.0;
-    newvertex.y = (float)(rand()) / (float)(RAND_MAX/2.0) - 1.0;
-    newvertex.z = (float)(rand()) / (float)(RAND_MAX/2.0) - 1.0;
+    newvertex.pos[0] = (float)(rand()) / (float)(RAND_MAX/2.0) - 1.0;
+    newvertex.pos[1] = (float)(rand()) / (float)(RAND_MAX/2.0) - 1.0;
+    newvertex.pos[2] = (float)(rand()) / (float)(RAND_MAX/2.0) - 1.0;
 
-    newvertex.vx = ((float)(rand()) / (float)(RAND_MAX/2.0) - 1.0) / 5.0;
-    newvertex.vy = ((float)(rand()) / (float)(RAND_MAX/2.0) - 1.0) / 5.0;
-    newvertex.vz = ((float)(rand()) / (float)(RAND_MAX/2.0) - 1.0) / 5.0;
+    newvertex.vel[0] = (float)(rand()) / (float)(RAND_MAX/2.0) - 1.0;
+    newvertex.vel[1] = (float)(rand()) / (float)(RAND_MAX/2.0) - 1.0;
+    newvertex.vel[2] = (float)(rand()) / (float)(RAND_MAX/2.0) - 1.0;
 
     this->vertex_array.push_back(newvertex);
 
@@ -80,7 +78,7 @@ uint32_t DrawableGraph::add_edge(uint32_t vertex_idx1, uint32_t vertex_idx2) {
 }
 
 bool DrawableGraph::delete_vertex(uint32_t vertex_idx) {
-    this->vertex_array[vertex_idx].active = 0;
+    // this->vertex_array[vertex_idx].active = 0;
     return true;
 }
 

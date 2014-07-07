@@ -12,14 +12,8 @@ namespace konig {
 
 // for pure sequential memory (draw as vbo fast)
 typedef struct {
-    uint32_t active;
-    float x;
-    float y;
-    float z;
-    float vx;
-    float vy;
-    float vz;
-    float dummy;
+    float pos[4];
+    float vel[4];
 } vertex_t;
 
 // for pure sequential memory (draw as vbo fast)

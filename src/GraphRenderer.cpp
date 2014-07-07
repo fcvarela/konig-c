@@ -98,7 +98,7 @@ bool GraphRenderer::draw(std::map<uint32_t, DrawableGraph*> *graph_list) {
             continue;
 
         glBindBuffer(GL_ARRAY_BUFFER, graph->vbo_out);
-        glVertexPointer(3, GL_FLOAT, sizeof(vertex_t), (char *)NULL + 4); // size of first element
+        glVertexPointer(3, GL_FLOAT, sizeof(vertex_t), 0); // size of first element
         glDrawArrays(GL_POINTS, 0, graph->element_count);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }

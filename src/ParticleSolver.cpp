@@ -6,14 +6,11 @@ namespace konig {
 
 ParticleSolver::ParticleSolver() {
     const char *cl_kernel_src[] = {
-        "typedef struct {\n",
-        "    uint active;\n",
-        "    float3 pos;\n",
-        "    float3 vel;\n",
-        "    float dummy;\n",
-        "} vertex_t;\n",
-        "\n",
-        "__kernel void vertex_step(__global vertex_t *in, __global vertex_t *out, const float dt) {\n",
+        "struct __attribute__ ((packed)) Particle {\n",
+        "    float4 pos;\n",
+        "    float4 vel;\n",
+        "};",
+        "__kernel void vertex_step(__global struct Particle *in, __global struct Particle *out, const float dt) {\n",
         "    int id = get_global_id(0);\n",
         "    out[id].pos = in[id].pos + in[id].vel * dt;\n",
         "    out[id].vel = in[id].vel;\n",
@@ -77,7 +74,6 @@ ParticleSolver::~ParticleSolver() {
 }
 
 void ParticleSolver::step(GLuint vbo_in, GLuint vbo_out, size_t element_count, float dt) {
-    glFinish();
     this->cl_vbo_in = clCreateFromGLBuffer(this->context, CL_MEM_READ_ONLY, vbo_in, NULL);
     this->cl_vbo_out = clCreateFromGLBuffer(this->context, CL_MEM_WRITE_ONLY, vbo_out, NULL);
 
@@ -88,13 +84,12 @@ void ParticleSolver::step(GLuint vbo_in, GLuint vbo_out, size_t element_count, f
     clSetKernelArg(kernel, 1, sizeof(cl_mem), (void *)&this->cl_vbo_out);
     clSetKernelArg(kernel, 2, sizeof(float), &dt);
 
-    size_t global_work_size = 128;
+    size_t global_work_size = element_count;
 
     clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &global_work_size, NULL, 0, 0, 0);
 
     clEnqueueReleaseGLObjects(queue, 1, &this->cl_vbo_in, 0, 0, 0);
     clEnqueueReleaseGLObjects(queue, 1, &this->cl_vbo_out, 0, 0, 0);
-    clFinish(queue);
 }
 
 }
