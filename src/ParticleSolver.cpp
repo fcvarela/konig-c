@@ -6,12 +6,11 @@
 using namespace konig;
 
 const char *cl_kernel_src[] = {
-    "typedef struct {\n",
-    "    float3 pos;\n",
-    "    float3 vel;\n",
-    "} vertex_t;\n",
-    "\n",
-    "__kernel void vertex_step(__global vertex_t *in, __global vertex_t *out, const float dt) {\n",
+    "struct __attribute__ ((packed)) Particle {\n",
+    "    float4 pos;\n",
+    "    float4 vel;\n",
+    "};",
+    "__kernel void vertex_step(__global struct Particle *in, __global struct Particle *out, const float dt) {\n",
     "    int id = get_global_id(0);\n",
     "    out[id].pos = in[id].pos + in[id].vel * dt;\n",
     "    out[id].vel = in[id].vel;\n",
@@ -162,9 +161,8 @@ void ParticleSolver::step(std::vector<vertex_t>&vertex_array, float dt) {
     
     // schedule the kernel
     size_t global_work_size = vertex_array.size();
-    size_t local_work_size = 256;
     cl_event kernel_completion;
-    cl_int status = clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &global_work_size, &local_work_size, 0, NULL, &kernel_completion);
+    cl_int status = clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &global_work_size, NULL, 0, NULL, &kernel_completion);
     if (status != CL_SUCCESS) {
         fprintf(stderr, "clCreateProgramWithSource: %s\n", get_error_string(status));
         exit(1);

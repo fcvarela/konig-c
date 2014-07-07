@@ -14,6 +14,7 @@ class GraphRenderer {
 private:
     GLFWwindow *window;
     double last_update;
+    double last_draw;
 
 public:
     GraphRenderer();

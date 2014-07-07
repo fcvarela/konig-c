@@ -47,6 +47,7 @@ GraphRenderer::GraphRenderer() {
     }
 
     this->last_update = glfwGetTime();
+    this->last_draw = glfwGetTime();
 
     glfwMakeContextCurrent(this->window);
     glfwSetKeyCallback(this->window, GraphRenderer::key_callback);
@@ -81,6 +82,7 @@ bool GraphRenderer::update(std::map<uint32_t, DrawableGraph*> *graph_list) {
 }
 
 bool GraphRenderer::draw(std::map<uint32_t, DrawableGraph*> *graph_list) {
+
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     glPointSize(1.0);
     glEnable(GL_POINT_SMOOTH);
@@ -106,5 +108,6 @@ bool GraphRenderer::draw(std::map<uint32_t, DrawableGraph*> *graph_list) {
     glDisableClientState(GL_VERTEX_ARRAY);
     
     glfwSwapBuffers(window);
+    last_draw = glfwGetTime();
     return true;
 }
