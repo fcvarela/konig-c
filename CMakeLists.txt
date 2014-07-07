@@ -21,6 +21,7 @@ list (APPEND KONIG_SOURCES
   src/DrawableGraph.cpp
   src/GraphRenderer.cpp
   src/ParticleSolver.cpp
+  src/clutils.cpp
 )
 
 # Append the header files here

@@ -41,6 +41,7 @@ public:
     ParticleSolver();
     ~ParticleSolver();
 
+    void pick_device();
     void step(std::vector<vertex_t>& array, float dt);
 };
 
