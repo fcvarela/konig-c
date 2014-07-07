@@ -75,6 +75,7 @@ void ParticleSolver::pick_device() {
             this->device = devices[j];
         }
     }
+    this->device = devices[2];
     free(devices);
 }
 
@@ -152,6 +153,7 @@ void ParticleSolver::step(std::vector<vertex_t>&vertex_array, float dt) {
 
     // schedule vertex_array -> input_buffer
     clEnqueueWriteBuffer(queue, input_buffer, CL_TRUE, 0, data_size, (void *)&vertex_array[0], 0, NULL, NULL);
+    clFinish(queue);
 
     // set kernel args
     clSetKernelArg(kernel, 0, sizeof(cl_mem), &input_buffer);
@@ -159,15 +161,19 @@ void ParticleSolver::step(std::vector<vertex_t>&vertex_array, float dt) {
     clSetKernelArg(kernel, 2, sizeof(float), &dt);
     
     // schedule the kernel
-    size_t global_work_size = vertex_array.size()*sizeof(vertex_t);
+    size_t global_work_size = vertex_array.size();
+    size_t local_work_size = 256;
     cl_event kernel_completion;
-    clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &global_work_size, NULL, 0, NULL, &kernel_completion);
+    cl_int status = clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &global_work_size, &local_work_size, 0, NULL, &kernel_completion);
+    if (status != CL_SUCCESS) {
+        fprintf(stderr, "clCreateProgramWithSource: %s\n", get_error_string(status));
+        exit(1);
+    }
     clWaitForEvents(1, &kernel_completion);
     clReleaseEvent(kernel_completion);
 
-    clEnqueueReadBuffer(queue, output_buffer, CL_TRUE, 0, data_size, (void *)&vertex_array[0], 0, NULL, NULL);
-
     // read memory back
+    clEnqueueReadBuffer(queue, output_buffer, CL_TRUE, 0, data_size, (void *)&vertex_array[0], 0, NULL, NULL);
     clReleaseMemObject(input_buffer);
     clReleaseMemObject(output_buffer);
 }
