@@ -2,7 +2,7 @@
 
 #include "ParticleSolver.h"
 
-namespace konig {
+using namespace konig;
 
 ParticleSolver::ParticleSolver() {
     const char *cl_kernel_src[] = {
@@ -13,14 +13,13 @@ ParticleSolver::ParticleSolver() {
         "\n",
         "__kernel void vertex_step(__global vertex_t *in, __global vertex_t *out, const float dt) {\n",
         "    int id = get_global_id(0);\n",
-        "\n",
         "    out[id].pos = in[id].pos + in[id].vel * dt;\n",
         "    out[id].vel = in[id].vel;\n",
         "}\n"
     };
 
     clGetPlatformIDs(100, &this->platform, NULL);
-    clGetDeviceIDs(platform, CL_DEVICE_TYPE_GPU, 1, &this->device, NULL);
+    clGetDeviceIDs(platform, CL_DEVICE_TYPE_CPU, 1, &this->device, NULL);
     
     #if defined ( __APPLE__ ) || defined ( MACOSX )
     cl_context_properties properties [] = {
@@ -99,6 +98,4 @@ void ParticleSolver::step(std::vector<vertex_t>&vertex_array, float dt) {
     // read memory back
     clReleaseMemObject(input_buffer);
     clReleaseMemObject(output_buffer);
-}
-
 }

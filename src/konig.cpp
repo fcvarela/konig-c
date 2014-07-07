@@ -25,7 +25,6 @@ extern "C" {
 uint8_t konig_bootstrap(void) {
     // seed the prng
     unsigned seed = (unsigned)time(0);
-    fprintf(stderr, "Seeding prng: %u\n", seed);
     srand(seed);
 
     // setup the renderer

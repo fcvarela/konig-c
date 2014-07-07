@@ -4,6 +4,7 @@
 namespace konig {
 
 // for pure sequential memory (draw as vbo fast)
+// aligned to 16 bytes for opencl null padding
 typedef struct {
     float pos[3];
     float vel[3];

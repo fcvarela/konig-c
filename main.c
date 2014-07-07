@@ -1,3 +1,4 @@
+#include <math.h>
 #include <konig.h>
 
 int main(int argc, char **argv) {

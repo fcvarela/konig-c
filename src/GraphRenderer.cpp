@@ -3,7 +3,7 @@
 
 #include "GraphRenderer.h"
 
-namespace konig {
+using namespace konig;
 
 void GraphRenderer::key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
@@ -25,7 +25,8 @@ void GraphRenderer::reshape_callback(GLFWwindow *window, int width, int height) 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-    // make sure we take into account expanding the box (10.0->whatever bounding sphere diameter is)
+    // make sure we take into account expanding the box
+    // (10.0->whatever bounding sphere diameter is)
     GraphRenderer::set_perspective(60.0, (GLfloat)width/(GLfloat)height, 1.0, 100.0);
 
     // setup modelview
@@ -106,6 +107,4 @@ bool GraphRenderer::draw(std::map<uint32_t, DrawableGraph*> *graph_list) {
     
     glfwSwapBuffers(window);
     return true;
-}
-
 }

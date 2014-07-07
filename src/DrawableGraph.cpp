@@ -3,7 +3,7 @@
 #include "DrawableGraph.h"
 #include "ParticleSolver.h"
 
-namespace konig {
+using namespace konig;
 
 DrawableGraph::DrawableGraph() {
     this->inited = false;
@@ -70,6 +70,4 @@ bool DrawableGraph::delete_vertex(uint32_t vertex_idx) {
 bool DrawableGraph::delete_edge(uint32_t edge_idx) {
     // this->edge_array[edge_idx].active = 0;
     return true;
-}
-
 }
