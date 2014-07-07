@@ -25,6 +25,7 @@
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
 
+#include "Vertex.h"
 
 namespace konig {
 
@@ -42,6 +43,7 @@ public:
     ParticleSolver();
     ~ParticleSolver();
 
+    void pick_device();
     void step(GLuint vbo_in, GLuint vbo_out, size_t element_count, float dt);
 };
 

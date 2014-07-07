@@ -6,22 +6,9 @@
 
 #include <GLFW/glfw3.h>
 
-#include "ParticleSolver.h"
+#include "Vertex.h"
 
 namespace konig {
-
-// for pure sequential memory (draw as vbo fast)
-typedef struct {
-    float pos[4];
-    float vel[4];
-} vertex_t;
-
-// for pure sequential memory (draw as vbo fast)
-typedef struct {
-    uint32_t active;
-    uint32_t vertex_idx1;
-    uint32_t vertex_idx2;
-} edge_t;
 
 // note that we don't actually need to perform _any_ graph
 // operations such as searches, paths, spanning trees, etc
@@ -30,6 +17,8 @@ typedef struct {
 // complexity is still on par w/ a binary tree search if using
 // list/set w/ pointers to actual data
 
+class ParticleSolver;
+
 class DrawableGraph {
 private:
     double last_update;
@@ -37,13 +26,11 @@ public:
     // pure vector storage for position computing and drawing
     std::vector<vertex_t> vertex_array;
     std::vector<edge_t> edge_array;
-    
+
     GLuint vbo_in, vbo_out;
 
-    void *buffer;
     size_t element_count;
     bool dirty;
-
     bool inited;
 
     ParticleSolver *solver;
