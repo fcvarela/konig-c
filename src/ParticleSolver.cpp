@@ -88,7 +88,7 @@ void ParticleSolver::step(std::vector<vertex_t>&vertex_array, float dt) {
     clSetKernelArg(kernel, 2, sizeof(float), &dt);
     
     // schedule the kernel
-    size_t global_work_size = vertex_array.size();
+    size_t global_work_size = vertex_array.size()*sizeof(vertex_t);
     cl_event kernel_completion;
     clEnqueueNDRangeKernel(queue, kernel, 1, NULL, &global_work_size, NULL, 0, NULL, &kernel_completion);
     clWaitForEvents(1, &kernel_completion);
