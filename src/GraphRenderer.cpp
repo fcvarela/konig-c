@@ -63,7 +63,7 @@ GraphRenderer::GraphRenderer() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     point_texture = SOIL_load_OGL_texture("data/textures/particle.bmp", SOIL_LOAD_AUTO, point_texture, SOIL_FLAG_MIPMAPS);
 
-    glPointSize(10.0);
+    glPointSize(5.0);
     glTexEnvf(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
     glEnable(GL_POINT_SPRITE);
     // glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
