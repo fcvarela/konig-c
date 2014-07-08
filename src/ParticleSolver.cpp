@@ -7,6 +7,39 @@
 
 using namespace konig;
 
+void ParticleSolver::load_kernel() {
+    // load the kernel from file
+    FILE *fp = fopen("data/kernels/graphtopo.cl", "r");
+    if (!fp) {
+        fprintf(stderr, "Failed to load kernel.\n");
+        exit(1);
+    }
+    char *source_str = (char*)malloc(MAX_SOURCE_SIZE);
+    size_t source_size = fread(source_str, 1, MAX_SOURCE_SIZE, fp);
+    fclose(fp);
+
+    cl_int status;
+    this->program = clCreateProgramWithSource(this->context, 1, (const char **)&source_str, (const size_t *)&source_size, &status);
+    if (status != CL_SUCCESS) {
+        fprintf(stderr, "clCreateProgramWithSource: %s\n", get_error_string(status));
+        exit(1);
+    }
+    
+    status = clBuildProgram(this->program, 0, NULL, NULL, NULL, NULL);
+    if (status != CL_SUCCESS) {
+        char buffer[10240];
+        clGetProgramBuildInfo(this->program, this->device, CL_PROGRAM_BUILD_LOG, sizeof(buffer), buffer, NULL);
+        fprintf(stderr, "clBuildProgram: CL Compilation failed:\n%s", buffer);
+        exit(1);
+    }
+
+    this->kernel = clCreateKernel(this->program, "vertex_step", &status);
+    if (!this->kernel || status != CL_SUCCESS) {
+        fprintf(stderr, "clCreateKernel: %s\n", get_error_string(status));
+        exit(1);
+    }
+}
+
 void ParticleSolver::pick_device() {
     // get platform count
     cl_uint platform_count;
@@ -68,10 +101,7 @@ void ParticleSolver::pick_device() {
     free(devices);
 }
 
-ParticleSolver::ParticleSolver() {
-    // select device w/ max compute units
-    pick_device();
-
+void ParticleSolver::init_context() {
     //bootstrap from that
     #if defined ( __APPLE__ ) || defined ( MACOSX )
     cl_context_properties properties [] = {
@@ -106,39 +136,13 @@ ParticleSolver::ParticleSolver() {
         fprintf(stderr, "clCreateCommandQueue: %s\n", get_error_string(status));
         exit(1);
     }
+}
 
-    // load the kernel from file
-    FILE *fp;
-    char *source_str;
-    size_t source_size;
-    fp = fopen("data/kernels/graphtopo.cl", "r");
-    if (!fp) {
-        fprintf(stderr, "Failed to load kernel.\n");
-        exit(1);
-    }
-    source_str = (char*)malloc(MAX_SOURCE_SIZE);
-    source_size = fread(source_str, 1, MAX_SOURCE_SIZE, fp);
-    fclose(fp);
-
-    this->program = clCreateProgramWithSource(this->context, 1, (const char **)&source_str, (const size_t *)&source_size, &status);
-    if (status != CL_SUCCESS) {
-        fprintf(stderr, "clCreateProgramWithSource: %s\n", get_error_string(status));
-        exit(1);
-    }
-    
-    status = clBuildProgram(this->program, 0, NULL, NULL, NULL, NULL);
-    if (status != CL_SUCCESS) {
-        char buffer[10240];
-        clGetProgramBuildInfo(this->program, this->device, CL_PROGRAM_BUILD_LOG, sizeof(buffer), buffer, NULL);
-        fprintf(stderr, "clBuildProgram: CL Compilation failed:\n%s", buffer);
-        exit(1);
-    }
-
-    this->kernel = clCreateKernel(this->program, "vertex_step", &status);
-    if (!this->kernel || status != CL_SUCCESS) {
-        fprintf(stderr, "clCreateKernel: %s\n", get_error_string(status));
-        exit(1);
-    }
+ParticleSolver::ParticleSolver() {
+    // select device w/ max compute units
+    pick_device();
+    init_context();
+    load_kernel();
 }
 
 ParticleSolver::~ParticleSolver() {

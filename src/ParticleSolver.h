@@ -44,6 +44,8 @@ public:
     ~ParticleSolver();
 
     void pick_device();
+    void init_context();
+    void load_kernel();
     void step(GLuint vbo_in, GLuint vbo_out, size_t element_count, float dt);
 };
 
