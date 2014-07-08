@@ -14,6 +14,7 @@ DrawableGraph::DrawableGraph() {
 
     glGenBuffers(1, &this->vbo_in);
     glGenBuffers(1, &this->vbo_out);
+    glGenBuffers(1, &this->edge_vbo);
 }
 
 DrawableGraph::~DrawableGraph() {
@@ -24,22 +25,28 @@ void DrawableGraph::step(double dt) {
     // are we dirty?
     if (glfwGetTime() - this->last_update > 0.1 && this->dirty) {
         // copy from out into vertex_array!!!
-        size_t byte_size = this->vertex_array.size() * sizeof(this->vertex_array[0]);
+        size_t vertex_byte_size = this->vertex_array.size() * sizeof(this->vertex_array[0]);
+        size_t edge_byte_size = this->edge_array.size() * sizeof(this->edge_array[0]);
+
         glBindBuffer(GL_ARRAY_BUFFER, this->vbo_in);
-        glBufferData(GL_ARRAY_BUFFER, byte_size, &this->vertex_array[0], GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, vertex_byte_size, &this->vertex_array[0], GL_DYNAMIC_DRAW);
 
         glBindBuffer(GL_ARRAY_BUFFER, this->vbo_out);
-        glBufferData(GL_ARRAY_BUFFER, byte_size, &this->vertex_array[0], GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, vertex_byte_size, &this->vertex_array[0], GL_DYNAMIC_DRAW);
+
+        glBindBuffer(GL_ARRAY_BUFFER, this->edge_vbo);
+        glBufferData(GL_ARRAY_BUFFER, edge_byte_size, &this->edge_array[0], GL_DYNAMIC_DRAW);
 
         this->inited = true;
         this->dirty = false;
-        this->element_count = this->vertex_array.size();
+        this->vertex_element_count = this->vertex_array.size();
+        this->edge_element_count = this->edge_array.size();
     }
 
     if (!this->inited)
         return;
 
-    solver->step(this->vbo_in, this->vbo_out, element_count, dt);
+    solver->step(this->vbo_in, this->vbo_out, this->edge_vbo, vertex_element_count, edge_element_count, dt);
 
     // swap the vbos
     GLuint temp = this->vbo_in;
@@ -56,10 +63,10 @@ uint32_t DrawableGraph::add_vertex() {
     newvertex.pos[2] = (float)(rand()) / (float)(RAND_MAX/100.0) - 50.0;
     newvertex.pos[3] = 0.0f;
 
-    newvertex.vel[0] = 0.0;//(float)(rand()) / (float)(RAND_MAX/2.0) - 1.0;
-    newvertex.vel[1] = 0.0;//(float)(rand()) / (float)(RAND_MAX/2.0) - 1.0;
-    newvertex.vel[2] = 0.0;//(float)(rand()) / (float)(RAND_MAX/2.0) - 1.0;
-    newvertex.vel[3] = 0.0f;
+    newvertex.vel[0] = 0.0;
+    newvertex.vel[1] = 0.0;
+    newvertex.vel[2] = 0.0;
+    newvertex.vel[3] = 0.0;
 
     this->vertex_array.push_back(newvertex);
 
@@ -75,7 +82,12 @@ uint32_t DrawableGraph::add_edge(uint32_t vertex_idx1, uint32_t vertex_idx2) {
     newedge.vertex_idx1 = vertex_idx1;
     newedge.vertex_idx2 = vertex_idx2;
 
-    return true;
+    this->edge_array.push_back(newedge);
+
+    this->last_update = glfwGetTime();
+    this->dirty = true;
+
+    return this->vertex_array.size() - 1;
 }
 
 bool DrawableGraph::delete_vertex(uint32_t vertex_idx) {

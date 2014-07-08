@@ -12,7 +12,6 @@ typedef struct {
 
 // for pure sequential memory (draw as vbo fast)
 typedef struct {
-    uint32_t active;
     uint32_t vertex_idx1;
     uint32_t vertex_idx2;
 } edge_t;

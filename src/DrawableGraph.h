@@ -28,8 +28,11 @@ public:
     std::vector<edge_t> edge_array;
 
     GLuint vbo_in, vbo_out;
+    GLuint edge_vbo;
 
-    size_t element_count;
+    size_t vertex_element_count;
+    size_t edge_element_count;
+
     bool dirty;
     bool inited;
 

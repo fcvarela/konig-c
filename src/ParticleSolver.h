@@ -36,9 +36,11 @@ public:
     cl_context context;
     cl_command_queue queue;
     cl_program program;
-    cl_kernel kernel;
 
-    cl_mem cl_vbo_in, cl_vbo_out;
+    cl_kernel vertices_kernel;
+    cl_kernel edges_kernel;
+
+    cl_mem cl_vbo_in, cl_vbo_out, cl_edge_vbo;
 
     ParticleSolver();
     ~ParticleSolver();
@@ -46,7 +48,8 @@ public:
     void pick_device();
     void init_context();
     void load_kernel();
-    void step(GLuint vbo_in, GLuint vbo_out, size_t element_count, float dt);
+    
+    void step(GLuint vbo_in, GLuint vbo_out, GLuint edge_vbo, size_t vertex_element_count, size_t edge_element_count, float dt);
 };
 
 }
