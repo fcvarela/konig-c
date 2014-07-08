@@ -3,28 +3,9 @@
 #include "clutils.h"
 #include "ParticleSolver.h"
 
-using namespace konig;
+#define MAX_SOURCE_SIZE (0x100000)
 
-const char *cl_kernel_src[] = {
-    "struct __attribute__ ((packed)) Particle {\n",
-    "    float4 pos;\n",
-    "    float4 vel;\n",
-    "};",
-    "__kernel void vertex_step(__global struct Particle *in, __global struct Particle *out, const float dt) {\n",
-    "   float4 acc = (float4)(0.0f, 0.0f, 0.0f, 0.0f);\n",
-    "   int total = get_global_size(0);\n",
-    "   int id = get_global_id(0);\n",
-    "   for (int i=0; i<total; i++) {\n",
-    "       float4 d = in[i].pos - in[id].pos;\n",
-    "       float invr = 1.0/sqrt(length(d)+0.0001);\n",
-    "       float invr3 = invr*invr*invr;\n",
-    "       float f = invr3;\n", // times mass if applicable
-    "       acc += f * d;\n",
-    "   }\n",
-    "   out[id].pos = in[id].pos + dt*in[id].vel + 0.5f*dt*dt*acc;\n",
-    "   out[id].vel = in[id].vel + acc * dt;\n",
-    "}\n"
-};
+using namespace konig;
 
 void ParticleSolver::pick_device() {
     // get platform count
@@ -83,7 +64,7 @@ void ParticleSolver::pick_device() {
             this->device = devices[j];
         }
     }
-    this->device = devices[1];
+    this->device = devices[2];
     free(devices);
 }
 
@@ -126,7 +107,20 @@ ParticleSolver::ParticleSolver() {
         exit(1);
     }
 
-    this->program = clCreateProgramWithSource(this->context, sizeof(cl_kernel_src)/sizeof(*cl_kernel_src), cl_kernel_src, NULL, &status);
+    // load the kernel from file
+    FILE *fp;
+    char *source_str;
+    size_t source_size;
+    fp = fopen("data/kernels/graphtopo.cl", "r");
+    if (!fp) {
+        fprintf(stderr, "Failed to load kernel.\n");
+        exit(1);
+    }
+    source_str = (char*)malloc(MAX_SOURCE_SIZE);
+    source_size = fread(source_str, 1, MAX_SOURCE_SIZE, fp);
+    fclose(fp);
+
+    this->program = clCreateProgramWithSource(this->context, 1, (const char **)&source_str, (const size_t *)&source_size, &status);
     if (status != CL_SUCCESS) {
         fprintf(stderr, "clCreateProgramWithSource: %s\n", get_error_string(status));
         exit(1);

@@ -43,7 +43,7 @@ GraphRenderer::GraphRenderer() {
 
     // request fullscreen
     const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-    this->window = glfwCreateWindow(mode->width, mode->height, "Konig", glfwGetPrimaryMonitor(), NULL);
+    this->window = glfwCreateWindow(mode->width/2.0, mode->height/2.0, "Konig", NULL/*primon: fs*/, NULL);
     if (!this->window) {
         glfwTerminate();
         exit(EXIT_FAILURE);
@@ -66,14 +66,14 @@ GraphRenderer::GraphRenderer() {
     glPointSize(5.0);
     glTexEnvf(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
     glEnable(GL_POINT_SPRITE);
-    // glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
+    glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
     glEnable(GL_POINT_SMOOTH);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN, GL_LOWER_LEFT);
     glEnable(GL_TEXTURE_2D);
 
-    GraphRenderer::reshape_callback(this->window, mode->width, mode->height);
+    GraphRenderer::reshape_callback(this->window, mode->width/2.0, mode->height/2.0);
 }
 
 GraphRenderer::~GraphRenderer() {

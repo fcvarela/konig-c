@@ -4,7 +4,7 @@ rm -rf build
 mkdir build
 cd build
 cmake .. -Wno-dev
-make -j4
+make
 cd ..
 
 gcc -o konig main.c -lkonig -Lbuild -Isrc

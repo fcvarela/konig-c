@@ -54,10 +54,12 @@ uint32_t DrawableGraph::add_vertex() {
     newvertex.pos[0] = (float)(rand()) / (float)(RAND_MAX/100.0) - 50.0;
     newvertex.pos[1] = (float)(rand()) / (float)(RAND_MAX/100.0) - 50.0;
     newvertex.pos[2] = (float)(rand()) / (float)(RAND_MAX/100.0) - 50.0;
+    newvertex.pos[3] = 0.0f;
 
     newvertex.vel[0] = 0.0;//(float)(rand()) / (float)(RAND_MAX/2.0) - 1.0;
     newvertex.vel[1] = 0.0;//(float)(rand()) / (float)(RAND_MAX/2.0) - 1.0;
     newvertex.vel[2] = 0.0;//(float)(rand()) / (float)(RAND_MAX/2.0) - 1.0;
+    newvertex.vel[3] = 0.0f;
 
     this->vertex_array.push_back(newvertex);
 
