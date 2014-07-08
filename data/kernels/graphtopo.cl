@@ -21,19 +21,28 @@ __kernel void vertex_step(__global struct Particle *in, __global struct Particle
         acc += f * d;
     }
     out[id].pos = in[id].pos + dt*in[id].vel + 0.5f*dt*dt*acc;
-    out[id].vel = in[id].vel + acc * dt;
+
+    float4 vel = in[id].vel + acc * dt;
+    if (length(vel) > 10.0)
+        vel = normalize(vel) * 10.0f;
+
+    out[id].vel = vel;
 }
 
 __kernel void edge_step(__global struct Edge *in, __global struct Particle *out, const float dt) {
     int id = get_global_id(0);
 
     // calculate force that p1 exerts on p2
-    float4 d = out[in[id].idx1].pos - out[in[id].idx2].pos;
+    float4 d = (out[in[id].idx1].pos - out[in[id].idx2].pos) - 100.0f;
     float invr = 1.0/sqrt(length(d)+0.0001);
     float invr3 = invr*invr*invr;
     float f = invr3; // times mass if applicable
-    float4 acc = f*1000.0f*d;
+    float4 acc = f*d*10.0f;
 
-    out[in[id].idx2].vel += acc*dt;
-    out[in[id].idx1].vel -= acc*dt;
+    float4 vel = acc * dt;
+    if (length(vel) > 10.0)
+        vel = normalize(vel) * 10.0f;
+
+    out[in[id].idx2].vel += vel;
+    out[in[id].idx1].vel -= vel;
 }
