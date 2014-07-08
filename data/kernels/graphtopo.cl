@@ -32,11 +32,7 @@ __kernel void edge_step(__global struct Edge *in, __global struct Particle *out,
     float invr = 1.0/sqrt(length(d)+0.0001);
     float invr3 = invr*invr*invr;
     float f = invr3; // times mass if applicable
-    float4 acc = f*2000.0f*d;
-
-    // update both particles
-    out[in[id].idx2].pos += 0.5f*dt*dt*acc;
-    out[in[id].idx1].pos -= 0.5f*dt*dt*acc;
+    float4 acc = f*1000.0f*d;
 
     out[in[id].idx2].vel += acc*dt;
     out[in[id].idx1].vel -= acc*dt;
