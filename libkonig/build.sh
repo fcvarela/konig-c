@@ -7,5 +7,5 @@ cmake .. -Wno-dev
 make
 cd ..
 
-gcc -o konig main.c -lkonig -Lbuild -Isrc
+gcc -o test-linked test-linked.c -lkonig -Lbuild -Isrc
 

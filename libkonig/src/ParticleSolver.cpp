@@ -24,7 +24,7 @@ void ParticleSolver::load_kernel() {
         fprintf(stderr, "clCreateProgramWithSource: %s\n", get_error_string(status));
         exit(1);
     }
-    
+
     status = clBuildProgram(this->program, 0, NULL, NULL, NULL, NULL);
     if (status != CL_SUCCESS) {
         char buffer[10240];

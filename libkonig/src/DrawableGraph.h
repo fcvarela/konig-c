@@ -37,7 +37,7 @@ public:
     bool inited;
 
     ParticleSolver *solver;
-    
+
     DrawableGraph();
     ~DrawableGraph();
 
