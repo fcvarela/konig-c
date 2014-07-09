@@ -65,6 +65,7 @@ __kernel void integrate(__global struct Particle *in, __global struct Particle *
     if (id == get_global_size(0)-1 && out[0].pos.w <= 0.001) {
         for (int i=0; i<get_global_size(0); i++) {
             out[i].vel.xyz = (float3)(0.0);
+            out[i].acc.xyz = (float3)(0.0);
         }
     }
 

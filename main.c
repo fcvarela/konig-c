@@ -10,7 +10,7 @@ uint32_t subtree(uint32_t parent, uint32_t n) {
     uint32_t eid = konig_graph_add_edge(graph_id, parent, vid);
 
     if (n > 0) {
-        for (int j=0; j<3; j++) {
+        for (int j=0; j<2; j++) {
             uint32_t v2 = subtree(vid, n-1);
         }
     }
@@ -24,7 +24,7 @@ int main(int argc, char **argv) {
 
     graph_id = konig_add_graph();
     uint32_t root_vid = konig_graph_add_vertex(graph_id);
-    uint32_t last_vid = subtree(root_vid, 6);
+    uint32_t last_vid = subtree(root_vid, 9);
 
     while (!konig_done()) {
         konig_update();

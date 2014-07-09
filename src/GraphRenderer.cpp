@@ -105,7 +105,7 @@ bool GraphRenderer::update(std::map<uint32_t, DrawableGraph*> *graph_list) {
 }
 
 bool GraphRenderer::draw(std::map<uint32_t, DrawableGraph*> *graph_list) {
-    angle += (glfwGetTime() - this->last_update)*1800000.0;
+    angle += (glfwGetTime() - this->last_update)*450000.0;
 
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     glLoadIdentity();

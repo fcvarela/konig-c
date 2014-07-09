@@ -109,7 +109,7 @@ void ParticleSolver::pick_device() {
             this->device = devices[j];
         }
     }
-    this->device = devices[1];
+    this->device = devices[2];
     free(devices);
 }
 
