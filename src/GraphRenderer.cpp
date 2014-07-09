@@ -28,7 +28,7 @@ void GraphRenderer::reshape_callback(GLFWwindow *window, int width, int height) 
 
     // make sure we take into account expanding the box
     // (10.0->whatever bounding sphere diameter is)
-    GraphRenderer::set_perspective(60.0, (GLfloat)width/(GLfloat)height, 1.0, 1000.0);
+    GraphRenderer::set_perspective(60.0, (GLfloat)width/(GLfloat)height, 1.0, 200.0);
 
     // setup modelview
     glMatrixMode(GL_MODELVIEW);
@@ -63,7 +63,7 @@ GraphRenderer::GraphRenderer() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     point_texture = SOIL_load_OGL_texture("data/textures/particle.bmp", SOIL_LOAD_AUTO, point_texture, SOIL_FLAG_MIPMAPS);
 
-    glPointSize(5.0);
+    glPointSize(15.0);
     glTexEnvf(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
     glEnable(GL_POINT_SPRITE);
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
@@ -71,9 +71,13 @@ GraphRenderer::GraphRenderer() {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE);
     glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN, GL_LOWER_LEFT);
-    glEnable(GL_TEXTURE_2D);
+
+    glLineWidth(1.0);
+    glEnable(GL_LINE_SMOOTH);
 
     GraphRenderer::reshape_callback(this->window, mode->width/2.0, mode->height/2.0);
+
+    angle = 0.0;
 }
 
 GraphRenderer::~GraphRenderer() {
@@ -101,9 +105,12 @@ bool GraphRenderer::update(std::map<uint32_t, DrawableGraph*> *graph_list) {
 }
 
 bool GraphRenderer::draw(std::map<uint32_t, DrawableGraph*> *graph_list) {
+    angle += (glfwGetTime() - this->last_update)*1800000.0;
+
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     glLoadIdentity();
-    glTranslatef(0.0, 0.0, -500.0);
+    glTranslatef(0.0, 0.0, -100.0);
+    glRotatef(angle, 0.0, 1.0, 0.0);
 
     glEnableClientState(GL_VERTEX_ARRAY);
 
@@ -113,10 +120,27 @@ bool GraphRenderer::draw(std::map<uint32_t, DrawableGraph*> *graph_list) {
         if (!graph->inited)
             continue;
 
+        glColor3f(0.0, 1.0, 0.0);
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, point_texture);
+    
         glBindBuffer(GL_ARRAY_BUFFER, graph->vbo_out);
         glVertexPointer(3, GL_FLOAT, sizeof(vertex_t), 0);
         glDrawArrays(GL_POINTS, 0, graph->vertex_element_count);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        glDisable(GL_TEXTURE_2D);
+
+        glColor3f(1.0, 0.0, 0.0);
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glBindBuffer(GL_ARRAY_BUFFER, graph->vbo_out);
+        glVertexPointer(3, GL_FLOAT, sizeof(vertex_t), 0);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, graph->edge_vbo);
+        glDrawElements(GL_LINES, graph->edge_array.size()*2.0, GL_UNSIGNED_INT, 0);
+        glDisableClientState(GL_VERTEX_ARRAY);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 
     glDisableClientState(GL_VERTEX_ARRAY);

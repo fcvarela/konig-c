@@ -34,8 +34,8 @@ void DrawableGraph::step(double dt) {
         glBindBuffer(GL_ARRAY_BUFFER, this->vbo_out);
         glBufferData(GL_ARRAY_BUFFER, vertex_byte_size, &this->vertex_array[0], GL_DYNAMIC_DRAW);
 
-        glBindBuffer(GL_ARRAY_BUFFER, this->edge_vbo);
-        glBufferData(GL_ARRAY_BUFFER, edge_byte_size, &this->edge_array[0], GL_DYNAMIC_DRAW);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->edge_vbo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, edge_byte_size, &this->edge_array[0], GL_DYNAMIC_DRAW);
 
         this->inited = true;
         this->dirty = false;

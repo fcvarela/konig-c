@@ -44,6 +44,12 @@ void ParticleSolver::load_kernel() {
         fprintf(stderr, "clCreateKernel: %s\n", get_error_string(status));
         exit(1);
     }
+
+    this->sum_kernel = clCreateKernel(this->program, "integrate", &status);
+    if (!this->sum_kernel || status != CL_SUCCESS) {
+        fprintf(stderr, "clCreateKernel: %s\n", get_error_string(status));
+        exit(1);
+    }
 }
 
 void ParticleSolver::pick_device() {
@@ -103,7 +109,7 @@ void ParticleSolver::pick_device() {
             this->device = devices[j];
         }
     }
-    this->device = devices[2];
+    this->device = devices[1];
     free(devices);
 }
 
@@ -154,6 +160,7 @@ ParticleSolver::ParticleSolver() {
 ParticleSolver::~ParticleSolver() {
     clReleaseKernel(this->vertices_kernel);
     clReleaseKernel(this->edges_kernel);
+    clReleaseKernel(this->sum_kernel);
     clReleaseProgram(program);
     clReleaseContext(context);
 }
@@ -162,25 +169,28 @@ void ParticleSolver::step(GLuint vbo_in, GLuint vbo_out, GLuint edge_vbo, size_t
     // solve vertex
     this->cl_vbo_in = clCreateFromGLBuffer(this->context, CL_MEM_READ_ONLY, vbo_in, NULL);
     this->cl_vbo_out = clCreateFromGLBuffer(this->context, CL_MEM_READ_WRITE, vbo_out, NULL);
+    this->cl_edge_vbo = clCreateFromGLBuffer(this->context, CL_MEM_READ_ONLY, edge_vbo, NULL);
 
     clEnqueueAcquireGLObjects(this->queue, 1, &this->cl_vbo_in, 0, 0, 0);
     clEnqueueAcquireGLObjects(this->queue, 1, &this->cl_vbo_out, 0, 0, 0);
+    clEnqueueAcquireGLObjects(this->queue, 1, &this->cl_edge_vbo, 0, 0, 0);
 
-    // set kernel args
+    // vertices
     clSetKernelArg(vertices_kernel, 0, sizeof(cl_mem), (void *)&this->cl_vbo_in);
     clSetKernelArg(vertices_kernel, 1, sizeof(cl_mem), (void *)&this->cl_vbo_out);
-    clSetKernelArg(vertices_kernel, 2, sizeof(float), &dt);
-    
-    // schedule the kernel
     cl_int status = clEnqueueNDRangeKernel(queue, vertices_kernel, 1, NULL, &vertex_element_count, NULL, 0, 0, 0);
 
-    // solve edges
-    this->cl_edge_vbo = clCreateFromGLBuffer(this->context, CL_MEM_READ_ONLY, edge_vbo, NULL);
-    clEnqueueAcquireGLObjects(this->queue, 1, &this->cl_edge_vbo, 0, 0, 0);
+    // edges
     clSetKernelArg(edges_kernel, 0, sizeof(cl_mem), (void *)&this->cl_edge_vbo);
-    clSetKernelArg(edges_kernel, 1, sizeof(cl_mem), (void *)&this->cl_vbo_out);
-    clSetKernelArg(edges_kernel, 2, sizeof(float), &dt);
+    clSetKernelArg(edges_kernel, 1, sizeof(cl_mem), (void *)&this->cl_vbo_in);
+    clSetKernelArg(edges_kernel, 2, sizeof(cl_mem), (void *)&this->cl_vbo_out);
     status = clEnqueueNDRangeKernel(queue, edges_kernel, 1, NULL, &edge_element_count, NULL, 0, 0, 0);
+
+    // integrate
+    clSetKernelArg(sum_kernel, 0, sizeof(cl_mem), (void *)&this->cl_vbo_in);
+    clSetKernelArg(sum_kernel, 1, sizeof(cl_mem), (void *)&this->cl_vbo_out);
+    clSetKernelArg(sum_kernel, 2, sizeof(float), &dt);
+    status = clEnqueueNDRangeKernel(queue, sum_kernel, 1, NULL, &vertex_element_count, NULL, 0, 0, 0);
 
     clEnqueueReleaseGLObjects(queue, 1, &this->cl_vbo_in, 0, 0, 0);
     clEnqueueReleaseGLObjects(queue, 1, &this->cl_vbo_out, 0, 0, 0);

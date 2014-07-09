@@ -13,7 +13,7 @@ namespace konig {
 class GraphRenderer {
 private:
     GLFWwindow *window;
-    double last_update;
+    double last_update, angle;
     GLuint point_texture;
 
 public:

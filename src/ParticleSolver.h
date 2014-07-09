@@ -39,6 +39,7 @@ public:
 
     cl_kernel vertices_kernel;
     cl_kernel edges_kernel;
+    cl_kernel sum_kernel;
 
     cl_mem cl_vbo_in, cl_vbo_out, cl_edge_vbo;
 

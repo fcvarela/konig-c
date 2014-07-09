@@ -8,6 +8,7 @@ namespace konig {
 typedef struct {
     float pos[4];
     float vel[4];
+    float acc[4];
 } vertex_t;
 
 // for pure sequential memory (draw as vbo fast)
