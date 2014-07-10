@@ -28,13 +28,15 @@ int main(int argc, char **argv) {
     uint32_t last_vid = tree(root_vid, 9);
 
     // circle
+    /*
     graph_id = konig_add_graph();
-    for (uint32_t i=0; i<100; i++) {
+    for (uint32_t i=0; i<1000; i++) {
         uint32_t vid = konig_graph_add_vertex(graph_id);
     }
-    for (uint32_t i=0; i<100: i++) {
-        uint32_t eid = ;
+    for (uint32_t i=0; i<1000; i++) {
+        uint32_t eid = konig_graph_add_edge(graph_id, i, (i+1)%1000);
     }
+    */
 
     while (!konig_done()) {
         konig_update();

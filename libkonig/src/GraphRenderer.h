@@ -3,18 +3,21 @@
 
 #include <map>
 
-#include <GLFW/glfw3.h>
+#include "gl.h"
 
-#include "DrawableGraph.h"
-
-namespace konig {
+class Texture;
+class DrawableGraph;
 
 // this is essentially a particle system renderer
 class GraphRenderer {
 private:
     GLFWwindow *window;
     double last_update, angle;
+
     GLuint point_texture;
+
+    GLuint framebuffer;
+    Texture *output_texture;
 
 public:
     GraphRenderer();
@@ -31,7 +34,5 @@ public:
     static void reshape_callback(GLFWwindow *window, int width, int height);
     static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
 };
-
-}
 
 #endif

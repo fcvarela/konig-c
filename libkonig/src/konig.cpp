@@ -3,16 +3,16 @@
 
 #include <map>
 
+#include "gl.h"
+
 #include "DrawableGraph.h"
 #include "GraphRenderer.h"
-
-using namespace konig;
 
 // global graph list for now
 std::map<uint32_t, DrawableGraph*> konig_graph_list;
 
 // global renderer
-GraphRenderer *konig_renderer;
+GraphRenderer *konig_renderer = NULL;
 
 // global object counter for now
 uint32_t konig_graphcount = 0;

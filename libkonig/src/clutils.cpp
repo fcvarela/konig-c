@@ -1,8 +1,6 @@
 #include "clutils.h"
 
-using namespace konig;
-
-const char * konig::get_error_string(cl_int err) {
+const char * get_error_string(cl_int err) {
     switch(err){
         case 0: return "CL_SUCCESS";
         case -1: return "CL_DEVICE_NOT_FOUND";

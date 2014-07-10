@@ -1,8 +1,8 @@
 #include <string>
 #include <utility>
-#include "ComputeToolkit.h"
 
-using namespace konig;
+#include "gl.h"
+#include "ComputeToolkit.h"
 
 std::map<uint8_t, std::string> ComputeToolkit::get_devices() {
     // get a platform

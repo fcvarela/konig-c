@@ -23,6 +23,7 @@ list (APPEND KONIG_SOURCES
   src/ParticleSolver.cpp
   src/clutils.cpp
   src/ComputeToolkit.cpp
+  src/Texture.cpp
 )
 
 # Append the header files here
@@ -45,24 +46,25 @@ pkg_search_module(GLFW REQUIRED glfw3)
 pkg_search_module(GLEW REQUIRED glew)
 
 include_directories(/usr/local/include/SOIL)
+
 include_directories(${GLFW_INCLUDE_DIRS})
 include_directories(${GLEW_INCLUDE_DIRS})
 include_directories(${OPENGL_INCLUDE_DIR})
 include_directories(${OPENCL_INCLUDE_DIR})
 
 link_directories(/usr/local/lib)
-link_directories(${GLEW_LIBRARY_DIRS})
 link_directories(${GLFW_LIBRARY_DIRS})
+link_directories(${GLEW_LIBRARIES})
 link_directories(${OPENGL_LIBRARIES})
 link_directories(${OPENCL_LIBRARIES})
 
 # Linking
 target_link_libraries(${KONIG_LIBRARY_NAME} ${EXTRA_LIBS})
-target_link_libraries(${KONIG_LIBRARY_NAME} ${GLEW_LIBRARY})
 target_link_libraries(${KONIG_LIBRARY_NAME} ${GLFW_LIBRARIES})
 target_link_libraries(${KONIG_LIBRARY_NAME} ${OPENGL_LIBRARIES})
 target_link_libraries(${KONIG_LIBRARY_NAME} ${OPENCL_LIBRARIES})
 target_link_libraries(${KONIG_LIBRARY_NAME} SOIL)
+target_link_libraries(${KONIG_LIBRARY_NAME} ${GLEW_LIBRARIES})
 
 SET_TARGET_PROPERTIES(${KONIG_LIBRARY_NAME} PROPERTIES
                                             VERSION ${KONIG_VERSION_MAJOR}.${KONIG_VERSION_MINOR}

@@ -4,11 +4,7 @@
 #include <vector>
 #include <stdint.h>
 
-#include <GLFW/glfw3.h>
-
-#include "Vertex.h"
-
-namespace konig {
+#include "gl.h"
 
 // note that we don't actually need to perform _any_ graph
 // operations such as searches, paths, spanning trees, etc
@@ -47,7 +43,5 @@ public:
     bool delete_vertex(uint32_t vertex_idx);
     bool delete_edge(uint32_t edge_idx);
 };
-
-}
 
 #endif

@@ -1,10 +1,9 @@
 #include <math.h>
 #include <stdlib.h>
-#include <SOIL.h>
 
 #include "GraphRenderer.h"
-
-using namespace konig;
+#include "DrawableGraph.h"
+#include "Texture.h"
 
 void GraphRenderer::key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
@@ -52,6 +51,7 @@ GraphRenderer::GraphRenderer() {
     this->last_update = glfwGetTime();
 
     glfwMakeContextCurrent(this->window);
+    glewInit();
     glfwSetKeyCallback(this->window, GraphRenderer::key_callback);
     glfwSetFramebufferSizeCallback(this->window, GraphRenderer::reshape_callback);
     glfwSwapInterval(1);
@@ -105,6 +105,10 @@ bool GraphRenderer::update(std::map<uint32_t, DrawableGraph*> *graph_list) {
 }
 
 bool GraphRenderer::draw(std::map<uint32_t, DrawableGraph*> *graph_list) {
+    // glBindFramebuffer(GL_FRAMEBUFFER, this->framebuffer);
+    // glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this->output_texture->id, 0);
+    //this->output_texture->bind(GL_TEXTURE1);
+
     angle += (glfwGetTime() - this->last_update)*450000.0;
 
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
@@ -144,6 +148,7 @@ bool GraphRenderer::draw(std::map<uint32_t, DrawableGraph*> *graph_list) {
     }
 
     glDisableClientState(GL_VERTEX_ARRAY);
+    // glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glfwSwapBuffers(window);
     return true;
 }

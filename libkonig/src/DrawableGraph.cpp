@@ -3,8 +3,6 @@
 #include "DrawableGraph.h"
 #include "ParticleSolver.h"
 
-using namespace konig;
-
 DrawableGraph::DrawableGraph() {
     this->inited = false;
     this->last_update = glfwGetTime();

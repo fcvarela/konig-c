@@ -5,8 +5,6 @@
 
 #define MAX_SOURCE_SIZE (0x100000)
 
-using namespace konig;
-
 void ParticleSolver::load_kernel() {
     // load the kernel from file
     FILE *fp = fopen("data/kernels/graphtopo.cl", "r");
