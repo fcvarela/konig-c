@@ -57,22 +57,23 @@ GraphRenderer::GraphRenderer() {
     glfwSwapInterval(1);
 
     // load texture here for now: needs refactoring
-    glGenTextures(1, &point_texture);
-    glBindTexture(GL_TEXTURE_2D, point_texture);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    point_texture = SOIL_load_OGL_texture("data/textures/particle.bmp", SOIL_LOAD_AUTO, point_texture, SOIL_FLAG_MIPMAPS);
+    // glGenTextures(1, &point_texture);
+    // glBindTexture(GL_TEXTURE_2D, point_texture);
+    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // point_texture = SOIL_load_OGL_texture("data/textures/particle.bmp", SOIL_LOAD_AUTO, point_texture, SOIL_FLAG_MIPMAPS);
 
+    // set basic properties
     glPointSize(15.0);
-    glTexEnvf(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
-    glEnable(GL_POINT_SPRITE);
+    // glTexEnvf(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
+    // glEnable(GL_POINT_SPRITE);
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
     glEnable(GL_POINT_SMOOTH);
     glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-    glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN, GL_LOWER_LEFT);
+    // glPointParameteri(GL_POINT_SPRITE_COORD_ORIGIN, GL_LOWER_LEFT);
+    glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
 
-    glLineWidth(1.0);
+    glLineWidth(2.0);
     glEnable(GL_LINE_SMOOTH);
 
     GraphRenderer::reshape_callback(this->window, mode->width/2.0, mode->height/2.0);
@@ -125,6 +126,7 @@ bool GraphRenderer::draw(std::map<uint32_t, DrawableGraph*> *graph_list) {
             continue;
 
         glColor3f(0.0, 1.0, 0.0);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE);
         glEnable(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, point_texture);
 
@@ -134,7 +136,7 @@ bool GraphRenderer::draw(std::map<uint32_t, DrawableGraph*> *graph_list) {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         glDisable(GL_TEXTURE_2D);
-
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glColor3f(1.0, 0.0, 0.0);
         glEnableClientState(GL_VERTEX_ARRAY);
         glBindBuffer(GL_ARRAY_BUFFER, graph->vbo_out);
