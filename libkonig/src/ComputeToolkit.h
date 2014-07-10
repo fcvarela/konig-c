@@ -19,12 +19,16 @@
     #define GLFW_EXPOSE_NATIVE_GLX
 #endif
 
+#include <map>
+
 #include <GLFW/glfw3.h>
 #include <GLFW/glfw3native.h>
 
 namespace konig {
 
 class ComputeToolkit {
+public:
+    static std::map<uint8_t, std::string> get_devices();
 
 };
 

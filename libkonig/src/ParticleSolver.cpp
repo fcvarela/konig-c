@@ -67,13 +67,13 @@ void ParticleSolver::pick_device() {
 
     clGetPlatformIDs(1, &this->platform, NULL);
 
-    clGetDeviceIDs(this->platform, CL_DEVICE_TYPE_ALL, 0, NULL, &deviceCount);
+    clGetDeviceIDs(this->platform, CL_DEVICE_TYPE_GPU|CL_DEVICE_HOST_UNIFIED_MEMORY, 0, NULL, &deviceCount);
     devices = (cl_device_id*) malloc(sizeof(cl_device_id) * deviceCount);
-    clGetDeviceIDs(this->platform, CL_DEVICE_TYPE_ALL, deviceCount, devices, NULL);
+    clGetDeviceIDs(this->platform, CL_DEVICE_TYPE_GPU|CL_DEVICE_HOST_UNIFIED_MEMORY, deviceCount, devices, NULL);
 
-        // for each device print critical attributes
+    // for each device print critical attributes
     for (int j = 0; j < deviceCount; j++) {
-            // print device name
+        // print device name
         clGetDeviceInfo(devices[j], CL_DEVICE_NAME, 0, NULL, &valueSize);
         value = (char*) malloc(valueSize);
         clGetDeviceInfo(devices[j], CL_DEVICE_NAME, valueSize, value, NULL);
@@ -109,7 +109,7 @@ void ParticleSolver::pick_device() {
             this->device = devices[j];
         }
     }
-    this->device = devices[2];
+    this->device = devices[1];
     free(devices);
 }
 
