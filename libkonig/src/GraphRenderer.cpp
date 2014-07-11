@@ -64,7 +64,7 @@ GraphRenderer::GraphRenderer() {
     // point_texture = SOIL_load_OGL_texture("data/textures/particle.bmp", SOIL_LOAD_AUTO, point_texture, SOIL_FLAG_MIPMAPS);
 
     // set basic properties
-    glPointSize(15.0);
+    glPointSize(8.0);
     // glTexEnvf(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
     // glEnable(GL_POINT_SPRITE);
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
@@ -143,7 +143,7 @@ bool GraphRenderer::draw(std::map<uint32_t, DrawableGraph*> *graph_list) {
         glVertexPointer(3, GL_FLOAT, sizeof(vertex_t), 0);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, graph->edge_vbo);
-        glDrawElements(GL_LINES, graph->edge_array.size()*2.0, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_LINES, graph->edge_array.size()*2, GL_UNSIGNED_INT, 0);
         glDisableClientState(GL_VERTEX_ARRAY);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
