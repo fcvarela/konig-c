@@ -1,10 +1,10 @@
 #include "Texture.h"
 
 Texture::Texture(uint16_t size, bool init) {
-    this->size = size;
-    glGenTextures(1, &this->id);
+    size = size;
+    glGenTextures(1, &id);
 
-    glBindTexture(GL_TEXTURE_2D, this->id);
+    glBindTexture(GL_TEXTURE_2D, id);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);;
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -12,16 +12,16 @@ Texture::Texture(uint16_t size, bool init) {
     glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
 
     if (init)
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, this->size, this->size, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size, size, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 }
 
 Texture::~Texture() {
-    glDeleteTextures(1, &this->id);
+    glDeleteTextures(1, &id);
 }
 
 void Texture::bind(GLuint textureUnit) {
     glActiveTexture(textureUnit);
-    glBindTexture(GL_TEXTURE_2D, this->id);
+    glBindTexture(GL_TEXTURE_2D, id);
 }
 
 void Texture::unbind() {

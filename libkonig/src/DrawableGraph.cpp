@@ -4,15 +4,15 @@
 #include "ParticleSolver.h"
 
 DrawableGraph::DrawableGraph() {
-    this->inited = false;
-    this->last_update = glfwGetTime();
-    this->dirty = false;
+    inited = false;
+    last_update = glfwGetTime();
+    dirty = false;
 
     solver = new ParticleSolver();
 
-    glGenBuffers(1, &this->vbo_in);
-    glGenBuffers(1, &this->vbo_out);
-    glGenBuffers(1, &this->edge_vbo);
+    glGenBuffers(1, &vbo_in);
+    glGenBuffers(1, &vbo_out);
+    glGenBuffers(1, &edge_vbo);
 }
 
 DrawableGraph::~DrawableGraph() {
@@ -21,35 +21,35 @@ DrawableGraph::~DrawableGraph() {
 
 void DrawableGraph::step(double dt) {
     // are we dirty?
-    if (glfwGetTime() - this->last_update > 0.1 && this->dirty) {
+    if (glfwGetTime() - last_update > 0.1 && dirty) {
         // copy from out into vertex_array!!!
-        size_t vertex_byte_size = this->vertex_array.size() * sizeof(this->vertex_array[0]);
-        size_t edge_byte_size = this->edge_array.size() * sizeof(this->edge_array[0]);
+        size_t vertex_byte_size = vertex_array.size() * sizeof(vertex_array[0]);
+        size_t edge_byte_size = edge_array.size() * sizeof(edge_array[0]);
 
-        glBindBuffer(GL_ARRAY_BUFFER, this->vbo_in);
-        glBufferData(GL_ARRAY_BUFFER, vertex_byte_size, &this->vertex_array[0], GL_DYNAMIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo_in);
+        glBufferData(GL_ARRAY_BUFFER, vertex_byte_size, &vertex_array[0], GL_DYNAMIC_DRAW);
 
-        glBindBuffer(GL_ARRAY_BUFFER, this->vbo_out);
-        glBufferData(GL_ARRAY_BUFFER, vertex_byte_size, &this->vertex_array[0], GL_DYNAMIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo_out);
+        glBufferData(GL_ARRAY_BUFFER, vertex_byte_size, &vertex_array[0], GL_DYNAMIC_DRAW);
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->edge_vbo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, edge_byte_size, &this->edge_array[0], GL_DYNAMIC_DRAW);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, edge_vbo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, edge_byte_size, &edge_array[0], GL_DYNAMIC_DRAW);
 
-        this->inited = true;
-        this->dirty = false;
-        this->vertex_element_count = this->vertex_array.size();
-        this->edge_element_count = this->edge_array.size();
+        inited = true;
+        dirty = false;
+        vertex_element_count = vertex_array.size();
+        edge_element_count = edge_array.size();
     }
 
-    if (!this->inited)
+    if (!inited)
         return;
 
-    solver->step(this->vbo_in, this->vbo_out, this->edge_vbo, vertex_element_count, edge_element_count, dt);
+    solver->step(vbo_in, vbo_out, edge_vbo, vertex_element_count, edge_element_count, dt);
 
     // swap the vbos
-    GLuint temp = this->vbo_in;
-    this->vbo_in = this->vbo_out;
-    this->vbo_out = temp;
+    GLuint temp = vbo_in;
+    vbo_in = vbo_out;
+    vbo_out = temp;
 }
 
 uint32_t DrawableGraph::add_vertex() {
@@ -66,12 +66,12 @@ uint32_t DrawableGraph::add_vertex() {
     newvertex.vel[2] = 0.0;
     newvertex.vel[3] = 0.0;
 
-    this->vertex_array.push_back(newvertex);
+    vertex_array.push_back(newvertex);
 
-    this->last_update = glfwGetTime();
-    this->dirty = true;
+    last_update = glfwGetTime();
+    dirty = true;
 
-    return this->vertex_array.size() - 1;
+    return vertex_array.size() - 1;
 }
 
 uint32_t DrawableGraph::add_edge(uint32_t vertex_idx1, uint32_t vertex_idx2) {
@@ -80,20 +80,20 @@ uint32_t DrawableGraph::add_edge(uint32_t vertex_idx1, uint32_t vertex_idx2) {
     newedge.vertex_idx1 = vertex_idx1;
     newedge.vertex_idx2 = vertex_idx2;
 
-    this->edge_array.push_back(newedge);
+    edge_array.push_back(newedge);
 
-    this->last_update = glfwGetTime();
-    this->dirty = true;
+    last_update = glfwGetTime();
+    dirty = true;
 
-    return this->vertex_array.size() - 1;
+    return vertex_array.size() - 1;
 }
 
 bool DrawableGraph::delete_vertex(uint32_t vertex_idx) {
-    // this->vertex_array[vertex_idx].active = 0;
+    // vertex_array[vertex_idx].active = 0;
     return true;
 }
 
 bool DrawableGraph::delete_edge(uint32_t edge_idx) {
-    // this->edge_array[edge_idx].active = 0;
+    // edge_array[edge_idx].active = 0;
     return true;
 }

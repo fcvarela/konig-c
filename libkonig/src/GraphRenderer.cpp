@@ -42,18 +42,18 @@ GraphRenderer::GraphRenderer() {
 
     // request fullscreen
     const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-    this->window = glfwCreateWindow(mode->width/2.0, mode->height/2.0, "Konig", NULL/*primon: fs*/, NULL);
-    if (!this->window) {
+    window = glfwCreateWindow(mode->width/2.0, mode->height/2.0, "Konig", NULL/*primon: fs*/, NULL);
+    if (!window) {
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
 
-    this->last_update = glfwGetTime();
+    last_update = glfwGetTime();
 
-    glfwMakeContextCurrent(this->window);
+    glfwMakeContextCurrent(window);
     glewInit();
-    glfwSetKeyCallback(this->window, GraphRenderer::key_callback);
-    glfwSetFramebufferSizeCallback(this->window, GraphRenderer::reshape_callback);
+    glfwSetKeyCallback(window, GraphRenderer::key_callback);
+    glfwSetFramebufferSizeCallback(window, GraphRenderer::reshape_callback);
     glfwSwapInterval(1);
 
     // load texture here for now: needs refactoring
@@ -76,7 +76,7 @@ GraphRenderer::GraphRenderer() {
     glLineWidth(2.0);
     glEnable(GL_LINE_SMOOTH);
 
-    GraphRenderer::reshape_callback(this->window, mode->width/2.0, mode->height/2.0);
+    GraphRenderer::reshape_callback(window, mode->width/2.0, mode->height/2.0);
 
     angle = 0.0;
 }
@@ -87,11 +87,11 @@ GraphRenderer::~GraphRenderer() {
 }
 
 bool GraphRenderer::done() {
-    return glfwWindowShouldClose(this->window);
+    return glfwWindowShouldClose(window);
 }
 
 bool GraphRenderer::update(std::map<uint32_t, DrawableGraph*> *graph_list) {
-    double dt = glfwGetTime() - this->last_update;
+    double dt = glfwGetTime() - last_update;
 
     std::map<uint32_t, DrawableGraph *>::iterator iter;
     for (iter = graph_list->begin(); iter != graph_list->end(); iter++) {
@@ -101,16 +101,16 @@ bool GraphRenderer::update(std::map<uint32_t, DrawableGraph*> *graph_list) {
 
     glfwPollEvents();
 
-    this->last_update = glfwGetTime();
+    last_update = glfwGetTime();
     return true;
 }
 
 bool GraphRenderer::draw(std::map<uint32_t, DrawableGraph*> *graph_list) {
-    // glBindFramebuffer(GL_FRAMEBUFFER, this->framebuffer);
-    // glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this->output_texture->id, 0);
-    //this->output_texture->bind(GL_TEXTURE1);
+    // glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+    // glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, output_texture->id, 0);
+    //output_texture->bind(GL_TEXTURE1);
 
-    angle += (glfwGetTime() - this->last_update)*450000.0;
+    angle += (glfwGetTime() - last_update)*450000.0;
 
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     glLoadIdentity();
