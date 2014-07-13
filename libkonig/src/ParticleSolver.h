@@ -23,10 +23,6 @@ public:
     ParticleSolver();
     ~ParticleSolver();
 
-    void pick_device();
-    void init_context();
-    void load_kernel();
-
     void step(GLuint vbo_in, GLuint vbo_out, GLuint edge_vbo, size_t vertex_element_count, size_t edge_element_count, float dt);
 };
 

@@ -22,7 +22,6 @@ list (APPEND KONIG_SOURCES
   src/GraphRenderer.cpp
   src/ParticleSolver.cpp
   src/clutils.cpp
-  src/ComputeToolkit.cpp
   src/Texture.cpp
 )
 
