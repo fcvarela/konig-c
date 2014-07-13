@@ -23,12 +23,6 @@ __kernel void vertex_step(__global struct Particle *in, __global struct Particle
         float3 force = (direction * coulomb_constant) / (distance*distance*0.5f);
         out[id].acc.xyz += force;
     }
-    
-    // calculate system energy
-    out[0].pos.w = 0.0f;
-    barrier(CLK_GLOBAL_MEM_FENCE);
-    out[0].pos.w += (0.5 * length(in[id].vel)*length(in[id].vel));
-    barrier(CLK_GLOBAL_MEM_FENCE);
 }
 
 __kernel void edge_step(__global struct Edge *ein, __global struct Particle *in, __global struct Particle *out) {
@@ -36,7 +30,7 @@ __kernel void edge_step(__global struct Edge *ein, __global struct Particle *in,
     int id1 = ein[id].idx1;
     int id2 = ein[id].idx2;
 
-    float spring_length = 1.0f;
+    float spring_length = 5.0f;
     float hooke_constant = 400.0f;
 
     // hooke
@@ -54,14 +48,9 @@ __kernel void integrate(__global struct Particle *in, __global struct Particle *
 
     // attract to centre
     float3 direction = -in[id].pos.xyz;
-    out[id].acc.xyz += direction * 400.0f/50.0f;
-
-    if (out[0].pos.w == 0.0) {
-        out[id].vel.xyz = (float3)(0.0);
-    } else {
-        out[id].vel.xyz = in[id].vel.xyz + out[id].acc.xyz*dt*0.5f;
-    }
+    out[id].acc.xyz += direction * 200.0f/50.0f;
 
     // integrate
-    out[id].pos = in[id].pos + out[id].vel*dt + out[id].acc*dt*dt*0.5f;
+    out[id].vel = (in[id].vel + dt * out[id].acc)*0.8f;
+    out[id].pos = in[id].pos + out[id].vel*dt;
 }
