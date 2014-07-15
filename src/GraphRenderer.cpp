@@ -116,7 +116,7 @@ bool GraphRenderer::draw(std::map<uint32_t, DrawableGraph*> *graph_list) {
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     glLoadIdentity();
     glTranslatef(0.0, 0.0, -100.0);
-    glRotatef(angle, 0.0, 1.0, 0.0);
+    //glRotatef(angle, 0.0, 1.0, 0.0);
 
     glEnableClientState(GL_VERTEX_ARRAY);
 
