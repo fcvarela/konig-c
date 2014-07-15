@@ -48,9 +48,9 @@ __kernel void integrate(__global struct Particle *in, __global struct Particle *
 
     // attract to centre
     float3 direction = -in[id].pos.xyz;
-    out[id].acc.xyz += direction * 200.0f/50.0f;
+    out[id].acc.xyz += direction * 500.0f/50.0f;
 
     // integrate
-    out[id].vel = (in[id].vel + dt * out[id].acc)*0.8f;
+    out[id].vel = (in[id].vel + dt * out[id].acc)*0.5f;
     out[id].pos = in[id].pos + out[id].vel*dt;
 }

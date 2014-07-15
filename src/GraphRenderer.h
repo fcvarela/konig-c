@@ -12,7 +12,8 @@ class DrawableGraph;
 class GraphRenderer {
 private:
     GLFWwindow *window;
-    double last_update, angle;
+    double last_update;
+    double angle;
 
     GLuint point_texture;
 

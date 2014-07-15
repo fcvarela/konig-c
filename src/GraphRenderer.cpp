@@ -21,6 +21,7 @@ void GraphRenderer::set_perspective(GLdouble fovy, GLdouble aspect, GLdouble zNe
 }
 
 void GraphRenderer::reshape_callback(GLFWwindow *window, int width, int height) {
+    glfwGetFramebufferSize(window, &width, &height);
     glViewport(0, 0, width, height);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -151,6 +152,8 @@ bool GraphRenderer::draw(std::map<uint32_t, DrawableGraph*> *graph_list) {
 
     glDisableClientState(GL_VERTEX_ARRAY);
     // glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glFlush();
     glfwSwapBuffers(window);
+    glFinish();
     return true;
 }
