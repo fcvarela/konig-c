@@ -4,6 +4,7 @@
 #include <map>
 
 #include "gl.h"
+#include "Quaternion.h"
 
 class Texture;
 class DrawableGraph;
@@ -13,7 +14,10 @@ class GraphRenderer {
 private:
     GLFWwindow *window;
     double last_update;
-    double angle;
+    Quatd rotation;
+
+    bool mouse_down;
+    double prev_mouse_coords[2];
 
     GLuint point_texture;
 
@@ -21,6 +25,11 @@ private:
     Texture *output_texture;
 
 public:
+    static GraphRenderer* instance () {
+        static GraphRenderer *instance = new GraphRenderer();
+        return instance;
+    }
+
     GraphRenderer();
     ~GraphRenderer();
 
@@ -31,7 +40,8 @@ public:
 
     // glu replacements
     static void set_perspective(GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar);
-
+    static void mouse_move_callback(GLFWwindow *window, double x, double y);
+    static void mouse_click_callback(GLFWwindow *window, int button, int action, int mods);
     static void reshape_callback(GLFWwindow *window, int width, int height);
     static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
 };

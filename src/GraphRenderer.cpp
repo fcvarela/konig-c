@@ -4,6 +4,42 @@
 #include "GraphRenderer.h"
 #include "DrawableGraph.h"
 #include "Texture.h"
+#include "Vector.h"
+
+
+void GraphRenderer::mouse_click_callback(GLFWwindow *window, int button, int action, int mods) {
+    GraphRenderer *r = instance();
+
+    // mouse down?
+    if (button == GLFW_MOUSE_BUTTON_1 && action == GLFW_PRESS) {
+        r->mouse_down = true;
+    }
+
+    if (button == GLFW_MOUSE_BUTTON_1 && action == GLFW_RELEASE) {
+        r->mouse_down = false;
+    }
+}
+
+void GraphRenderer::mouse_move_callback(GLFWwindow *window, double x, double y) {
+    GraphRenderer *r = instance();
+
+    if (r->mouse_down) {
+        // get travel
+        double mouse_up_coords[2];
+        glfwGetCursorPos(r->window, &mouse_up_coords[0], &mouse_up_coords[1]);
+        
+        double mouse_travel[2];
+        mouse_travel[0] = (mouse_up_coords[0] - r->prev_mouse_coords[0]);
+        mouse_travel[1] = (mouse_up_coords[1] - r->prev_mouse_coords[1]);
+
+        Vector3d delta = Vector3d(mouse_travel[1], mouse_travel[0], 0.0);
+        double deltalen = delta.length();
+        delta.normalize();
+
+        r->rotation = r->rotation * Quatd(delta, deltalen);
+    }
+    glfwGetCursorPos(r->window, &r->prev_mouse_coords[0], &r->prev_mouse_coords[1]);
+}
 
 void GraphRenderer::key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
@@ -36,6 +72,8 @@ void GraphRenderer::reshape_callback(GLFWwindow *window, int width, int height) 
 }
 
 GraphRenderer::GraphRenderer() {
+    rotation = Quatd(1.0, 0.0, 0.0, 0.0);
+
     if (!glfwInit()) {
         fprintf(stderr, "Error intializing glfw\n");
         exit(EXIT_FAILURE);
@@ -54,6 +92,8 @@ GraphRenderer::GraphRenderer() {
     glfwMakeContextCurrent(window);
     glewInit();
     glfwSetKeyCallback(window, GraphRenderer::key_callback);
+    glfwSetMouseButtonCallback(window, GraphRenderer::mouse_click_callback);
+    glfwSetCursorPosCallback(window, GraphRenderer::mouse_move_callback);
     glfwSetFramebufferSizeCallback(window, GraphRenderer::reshape_callback);
     glfwSwapInterval(1);
 
@@ -78,8 +118,6 @@ GraphRenderer::GraphRenderer() {
     glEnable(GL_LINE_SMOOTH);
 
     GraphRenderer::reshape_callback(window, mode->width/2.0, mode->height/2.0);
-
-    angle = 0.0;
 }
 
 GraphRenderer::~GraphRenderer() {
@@ -111,12 +149,15 @@ bool GraphRenderer::draw(std::map<uint32_t, DrawableGraph*> *graph_list) {
     // glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, output_texture->id, 0);
     //output_texture->bind(GL_TEXTURE1);
 
-    angle += (glfwGetTime() - last_update)*450000.0;
 
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     glLoadIdentity();
+
+    // setperspective
     glTranslatef(0.0, 0.0, -100.0);
-    //glRotatef(angle, 0.0, 1.0, 0.0);
+    GLdouble mat[16];
+    this->rotation.glMatrix(mat);
+    glMultMatrixd(mat);
 
     glEnableClientState(GL_VERTEX_ARRAY);
 
@@ -152,6 +193,7 @@ bool GraphRenderer::draw(std::map<uint32_t, DrawableGraph*> *graph_list) {
 
     glDisableClientState(GL_VERTEX_ARRAY);
     // glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
     glFlush();
     glfwSwapBuffers(window);
     glFinish();

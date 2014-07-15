@@ -28,7 +28,7 @@ uint8_t konig_bootstrap(void) {
     srand(seed);
 
     // setup the renderer
-    konig_renderer = new GraphRenderer();
+    konig_renderer = GraphRenderer::instance();
 
     return 1;
 }

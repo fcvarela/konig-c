@@ -14,15 +14,17 @@ __kernel void vertex_step(__global struct Particle *in, __global struct Particle
     int id = get_global_id(0);
 
     // coulomb
-    out[id].acc.xyz = (float3)(0.0f);
-    float coulomb_constant = 300.0f;
+    out[id].acc = (float4)(0.0f);
+    float coulomb_constant = 400.0f;
+    
     for (int i=0; i<total; i++) {
-        float3 d = in[id].pos.xyz - in[i].pos.xyz;
+        float4 d = in[id].pos - in[i].pos;
         float distance = length(d)+0.00001f;
-        float3 direction = normalize(d);
-        float3 force = (direction * coulomb_constant) / (distance*distance*0.5f);
-        out[id].acc.xyz += force;
+        float4 direction = normalize(d);
+        float4 force = (direction * coulomb_constant) / (distance*distance*0.5f);
+        out[id].acc += force;
     }
+    
 }
 
 __kernel void edge_step(__global struct Edge *ein, __global struct Particle *in, __global struct Particle *out) {
@@ -34,13 +36,13 @@ __kernel void edge_step(__global struct Edge *ein, __global struct Particle *in,
     float hooke_constant = 200.0f;
 
     // hooke
-    float3 d = in[id2].pos.xyz - in[id1].pos.xyz;
+    float4 d = in[id2].pos - in[id1].pos;
     float displacement = spring_length - length(d);
-    float3 direction = normalize(d);
-    float3 force = direction * (hooke_constant * displacement * 0.5f);
+    float4 direction = normalize(d);
+    float4 force = direction * (hooke_constant * displacement * 0.5f);
 
-    out[id1].acc.xyz -= force;
-    out[id2].acc.xyz += force;
+    out[id1].acc -= force;
+    out[id2].acc += force;
 }
 
 __kernel void integrate(__global struct Particle *in, __global struct Particle *out, const float dt) {
@@ -49,6 +51,6 @@ __kernel void integrate(__global struct Particle *in, __global struct Particle *
     float4 centerpos = in[0].pos;
 
     // integrate
-    out[id].vel = (in[id].vel + dt * out[id].acc)*0.8f;
+    out[id].vel = (in[id].vel + dt * out[id].acc)*0.5f;
     out[id].pos = in[id].pos + out[id].vel*dt - centerpos;
 }
