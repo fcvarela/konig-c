@@ -6,6 +6,16 @@
 #include "Texture.h"
 #include "Vector.h"
 
+void GraphRenderer::mouse_scroll_callback(GLFWwindow *window, double x, double y) {
+    GraphRenderer *r = instance();
+
+    r->ctr_distance -= y;
+    if (r->ctr_distance > 900.0)
+        r->ctr_distance = 900.0;
+
+    if (r->ctr_distance < 50.0)
+        r->ctr_distance = 50.0;
+}
 
 void GraphRenderer::mouse_click_callback(GLFWwindow *window, int button, int action, int mods) {
     GraphRenderer *r = instance();
@@ -29,7 +39,7 @@ void GraphRenderer::mouse_move_callback(GLFWwindow *window, double x, double y) 
         glfwGetCursorPos(r->window, &mouse_up_coords[0], &mouse_up_coords[1]);
         
         double mouse_travel[2];
-        mouse_travel[0] = (mouse_up_coords[0] - r->prev_mouse_coords[0]);
+        mouse_travel[0] -= (mouse_up_coords[0] - r->prev_mouse_coords[0]);
         mouse_travel[1] = (mouse_up_coords[1] - r->prev_mouse_coords[1]);
 
         Vector3d delta = Vector3d(mouse_travel[1], mouse_travel[0], 0.0);
@@ -64,7 +74,7 @@ void GraphRenderer::reshape_callback(GLFWwindow *window, int width, int height) 
 
     // make sure we take into account expanding the box
     // (10.0->whatever bounding sphere diameter is)
-    GraphRenderer::set_perspective(60.0, (GLfloat)width/(GLfloat)height, 1.0, 200.0);
+    GraphRenderer::set_perspective(60.0, (GLfloat)width/(GLfloat)height, 1.0, 1000.0);
 
     // setup modelview
     glMatrixMode(GL_MODELVIEW);
@@ -73,6 +83,7 @@ void GraphRenderer::reshape_callback(GLFWwindow *window, int width, int height) 
 
 GraphRenderer::GraphRenderer() {
     rotation = Quatd(1.0, 0.0, 0.0, 0.0);
+    ctr_distance = 200.0;
 
     if (!glfwInit()) {
         fprintf(stderr, "Error intializing glfw\n");
@@ -81,7 +92,7 @@ GraphRenderer::GraphRenderer() {
 
     // request fullscreen
     const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-    window = glfwCreateWindow(mode->width/2, mode->height/2, "Konig", NULL, NULL);
+    window = glfwCreateWindow(mode->width, mode->height, "Konig", glfwGetPrimaryMonitor(), NULL);
     if (!window) {
         glfwTerminate();
         exit(EXIT_FAILURE);
@@ -91,9 +102,13 @@ GraphRenderer::GraphRenderer() {
 
     glfwMakeContextCurrent(window);
     glewInit();
+
     glfwSetKeyCallback(window, GraphRenderer::key_callback);
+    
     glfwSetMouseButtonCallback(window, GraphRenderer::mouse_click_callback);
     glfwSetCursorPosCallback(window, GraphRenderer::mouse_move_callback);
+    glfwSetScrollCallback(window, GraphRenderer::mouse_scroll_callback);
+
     glfwSetFramebufferSizeCallback(window, GraphRenderer::reshape_callback);
     glfwSwapInterval(1);
 
@@ -154,7 +169,7 @@ bool GraphRenderer::draw(std::map<uint32_t, DrawableGraph*> *graph_list) {
     glLoadIdentity();
 
     // setperspective
-    glTranslatef(0.0, 0.0, -100.0);
+    glTranslatef(0.0, 0.0, -ctr_distance);
     GLdouble mat[16];
     this->rotation.glMatrix(mat);
     glMultMatrixd(mat);
