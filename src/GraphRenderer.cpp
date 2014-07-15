@@ -43,7 +43,7 @@ GraphRenderer::GraphRenderer() {
 
     // request fullscreen
     const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-    window = glfwCreateWindow(mode->width/2.0, mode->height/2.0, "Konig", NULL/*primon: fs*/, NULL);
+    window = glfwCreateWindow(mode->width/2, mode->height/2, "Konig", NULL, NULL);
     if (!window) {
         glfwTerminate();
         exit(EXIT_FAILURE);
