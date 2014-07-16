@@ -37,7 +37,7 @@ void GraphRenderer::mouse_move_callback(GLFWwindow *window, double x, double y) 
         // get travel
         double mouse_up_coords[2];
         glfwGetCursorPos(r->window, &mouse_up_coords[0], &mouse_up_coords[1]);
-        
+
         double mouse_travel[2];
         mouse_travel[0] -= (mouse_up_coords[0] - r->prev_mouse_coords[0]);
         mouse_travel[1] = (mouse_up_coords[1] - r->prev_mouse_coords[1]);
@@ -92,7 +92,7 @@ GraphRenderer::GraphRenderer() {
 
     // request fullscreen
     const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-    window = glfwCreateWindow(mode->width, mode->height, "Konig", glfwGetPrimaryMonitor(), NULL);
+    window = glfwCreateWindow(mode->width/2, mode->height/2, "Konig", NULL, NULL);
     if (!window) {
         glfwTerminate();
         exit(EXIT_FAILURE);
@@ -104,7 +104,7 @@ GraphRenderer::GraphRenderer() {
     glewInit();
 
     glfwSetKeyCallback(window, GraphRenderer::key_callback);
-    
+
     glfwSetMouseButtonCallback(window, GraphRenderer::mouse_click_callback);
     glfwSetCursorPosCallback(window, GraphRenderer::mouse_move_callback);
     glfwSetScrollCallback(window, GraphRenderer::mouse_scroll_callback);

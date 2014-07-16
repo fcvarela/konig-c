@@ -16,7 +16,7 @@ __kernel void vertex_step(__global struct Particle *in, __global struct Particle
     // coulomb
     out[id].acc = (float4)(0.0f);
     float coulomb_constant = 400.0f;
-    
+
     for (int i=0; i<total; i++) {
         float4 d = in[id].pos - in[i].pos;
         float distance = length(d)+0.00001f;
@@ -24,7 +24,6 @@ __kernel void vertex_step(__global struct Particle *in, __global struct Particle
         float4 force = (direction * coulomb_constant) / (distance*distance*0.5f);
         out[id].acc += force;
     }
-    
 }
 
 __kernel void edge_step(__global struct Edge *ein, __global struct Particle *in, __global struct Particle *out) {
@@ -32,8 +31,8 @@ __kernel void edge_step(__global struct Edge *ein, __global struct Particle *in,
     int id1 = ein[id].idx1;
     int id2 = ein[id].idx2;
 
-    float spring_length = 3.0f;
-    float hooke_constant = 200.0f;
+    float spring_length = 10.0f;
+    float hooke_constant = 250.0f;
 
     // hooke
     float4 d = in[id2].pos - in[id1].pos;
@@ -51,6 +50,6 @@ __kernel void integrate(__global struct Particle *in, __global struct Particle *
     float4 centerpos = in[0].pos;
 
     // integrate
-    out[id].vel = (in[id].vel + dt * out[id].acc)*0.5f;
+    out[id].vel = (in[id].vel + dt * out[id].acc)*0.8f;
     out[id].pos = in[id].pos + out[id].vel*dt - centerpos;
 }
