@@ -25,19 +25,9 @@ int main(int argc, char **argv) {
     // binary tree
     graph_id = konig_add_graph();
     uint32_t root_vid = konig_graph_add_vertex(graph_id);
-    uint32_t last_vid = tree(root_vid, 8);
+    uint32_t last_vid = tree(root_vid, 10);
 
     // circle
-    /*
-    graph_id = konig_add_graph();
-    for (uint32_t i=0; i<1000; i++) {
-        uint32_t vid = konig_graph_add_vertex(graph_id);
-    }
-    for (uint32_t i=0; i<1000; i++) {
-        uint32_t eid = konig_graph_add_edge(graph_id, i, (i+1)%1000);
-    }
-    */
-
     while (!konig_done()) {
         konig_update();
         konig_draw();

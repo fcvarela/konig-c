@@ -28,6 +28,7 @@ public:
 
     size_t vertex_element_count;
     size_t edge_element_count;
+    size_t old_capacity;
 
     bool dirty;
     bool inited;

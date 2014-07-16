@@ -1,3 +1,4 @@
+#include <string.h>
 #include <stdlib.h>
 
 #include "DrawableGraph.h"
@@ -26,7 +27,18 @@ DrawableGraph::~DrawableGraph() {
 void DrawableGraph::step(double dt) {
     // are we dirty?
     if (glfwGetTime() - last_update > 0.1 && dirty) {
-        // copy from out into vertex_array!!!
+        // move all of the append logic to the addvertex function
+        if (inited) {
+            glBindBuffer(GL_ARRAY_BUFFER, vbo_out);
+            vertex_t *vptr = (vertex_t *)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
+
+            vertex_t temp;
+            for (size_t count=0; count<vertex_array.size(); count++) {
+                memcpy(&vertex_array[count], &vptr[count], sizeof(vertex_t));
+            }
+            glUnmapBuffer(GL_ARRAY_BUFFER);
+        }
+
         size_t vertex_byte_size = vertex_array.size() * sizeof(vertex_array[0]);
         size_t edge_byte_size = edge_array.size() * sizeof(edge_array[0]);
 
@@ -43,6 +55,7 @@ void DrawableGraph::step(double dt) {
         dirty = false;
         vertex_element_count = vertex_array.size();
         edge_element_count = edge_array.size();
+        old_capacity = vertex_array.capacity();
     }
 
     if (!inited)
@@ -60,9 +73,9 @@ uint32_t DrawableGraph::add_vertex() {
     vertex_t newvertex;
 
     // randomize starting position (-1 to 1)
-    newvertex.pos[0] = (float)(rand()) / (float)(RAND_MAX/5.0) - 2.5;
-    newvertex.pos[1] = (float)(rand()) / (float)(RAND_MAX/5.0) - 2.5;
-    newvertex.pos[2] = (float)(rand()) / (float)(RAND_MAX/5.0) - 2.5;
+    newvertex.pos[0] = (float)(rand()) / (float)(RAND_MAX);
+    newvertex.pos[1] = (float)(rand()) / (float)(RAND_MAX);
+    newvertex.pos[2] = (float)(rand()) / (float)(RAND_MAX);
     newvertex.pos[3] = 0.0f;
 
     newvertex.vel[0] = 0.0;
