@@ -7,12 +7,14 @@
 
 #include "DrawableGraph.h"
 #include "GraphRenderer.h"
+#include "GraphRPCService.h"
 
 // global graph list for now
 std::map<uint32_t, DrawableGraph*> konig_graph_list;
 
 // global renderer
 GraphRenderer *konig_renderer = NULL;
+google::protobuf::Service *konig_rpc_service = NULL;
 
 // global object counter for now
 uint32_t konig_graphcount = 0;
@@ -29,6 +31,9 @@ uint8_t konig_bootstrap(void) {
 
     // setup the renderer
     konig_renderer = GraphRenderer::instance();
+
+    // setup the rpc server
+    konig_rpc_service = new GraphRPCService();
 
     return 1;
 }

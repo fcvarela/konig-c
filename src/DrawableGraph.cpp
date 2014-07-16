@@ -16,7 +16,11 @@ DrawableGraph::DrawableGraph() {
 }
 
 DrawableGraph::~DrawableGraph() {
+    glDeleteBuffers(1, &vbo_in);
+    glDeleteBuffers(1, &vbo_out);
+    glDeleteBuffers(1, &edge_vbo);
 
+    delete solver;
 }
 
 void DrawableGraph::step(double dt) {

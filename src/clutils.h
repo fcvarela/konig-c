@@ -1,3 +1,5 @@
+#ifndef KONIG_CLUTILS_H
+#define KONIG_CLUTILS_H
 
 #include "gl.h"
 
@@ -9,3 +11,5 @@ cl_context clutils__make_context(cl_platform_id platform, cl_device_id device);
 cl_command_queue clutils__make_command_queue(cl_context context, cl_device_id device);
 cl_program clutils__load_program(cl_context context, cl_device_id device, const char *filename);
 cl_kernel clutils__load_kernel(cl_program program, const char *kernel_name);
+
+#endif
