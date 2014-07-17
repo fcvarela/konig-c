@@ -32,7 +32,6 @@ list (APPEND KONIG_INCLUDE_FILES
   src/konig.h
 )
 
-
 # Create a shared lib
 add_library (konig_core OBJECT ${KONIG_SOURCES})
 add_library (${KONIG_LIBRARY_NAME} SHARED $<TARGET_OBJECTS:konig_core>)
