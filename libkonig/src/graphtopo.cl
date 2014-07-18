@@ -1,4 +1,5 @@
-struct __attribute__ ((packed)) Particle {
+MSTRINGIFY(
+   struct __attribute__ ((packed)) Particle {
     float4 pos;
     float4 vel;
     float4 acc;
@@ -55,3 +56,4 @@ __kernel void integrate(__global struct Particle *in, __global struct Particle *
     out[id].vel *= 0.9f;
     out[id].pos = in[id].pos + out[id].vel*dt - centerpos;
 }
+);

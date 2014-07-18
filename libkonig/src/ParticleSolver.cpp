@@ -1,13 +1,17 @@
 #include "clutils.h"
 #include "ParticleSolver.h"
 
+#define MSTRINGIFY(A) #A
+char source_str[] =
+#include "graphtopo.cl"
+
 ParticleSolver::ParticleSolver() {
     platform = clutils__get_default_platform();
     device = clutils__get_default_device(platform);
     context = clutils__make_context(platform, device);
     queue = clutils__make_command_queue(context, device);
 
-    program = clutils__load_program(context, device, "data/kernels/graphtopo.cl");
+    program = clutils__load_program(context, device, source_str, strlen(source_str));
     vertices_kernel = clutils__load_kernel(program, "vertex_step");
     edges_kernel = clutils__load_kernel(program, "edge_step");
     sum_kernel = clutils__load_kernel(program, "integrate");

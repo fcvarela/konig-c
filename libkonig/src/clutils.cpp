@@ -1,8 +1,7 @@
+#include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include "clutils.h"
-
-#define MAX_SOURCE_SIZE (0x100000)
 
 cl_platform_id clutils__get_default_platform() {
     cl_platform_id pid;
@@ -65,18 +64,7 @@ cl_command_queue clutils__make_command_queue(cl_context context, cl_device_id de
     return queue;
 }
 
-cl_program clutils__load_program(cl_context context, cl_device_id device, const char *filename) {
-    // load the kernel from file
-    FILE *fp = fopen(filename, "rt");
-    if (!fp) {
-        fprintf(stderr, "Failed to load kernel.\n");
-        exit(1);
-    }
-
-    char *source_str = (char*)malloc(MAX_SOURCE_SIZE);
-    size_t source_size = fread(source_str, 1, MAX_SOURCE_SIZE, fp);
-    fclose(fp);
-
+cl_program clutils__load_program(cl_context context, cl_device_id device, char *source_str, size_t source_size) {
     cl_int status;
     cl_program program = clCreateProgramWithSource(context, 1, (const char **)&source_str, (const size_t *)&source_size, &status);
     if (status != CL_SUCCESS) {
@@ -92,7 +80,6 @@ cl_program clutils__load_program(cl_context context, cl_device_id device, const 
         exit(1);
     }
 
-    free(source_str);
     return program;
 }
 
