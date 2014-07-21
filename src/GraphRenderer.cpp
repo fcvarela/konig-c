@@ -198,7 +198,7 @@ bool GraphRenderer::draw(std::map<uint32_t, DrawableGraph*> *graph_list) {
         glBindTexture(GL_TEXTURE_2D, point_texture);
 
         glBindBuffer(GL_ARRAY_BUFFER, graph->vbo_out);
-        glVertexPointer(4, GL_FLOAT, sizeof(vertex_t), 0);
+        glVertexPointer(3, GL_FLOAT, sizeof(vertex_t), 0);
         glDrawArrays(GL_POINTS, 0, graph->vertex_element_count);
 
         glDisable(GL_TEXTURE_2D);
