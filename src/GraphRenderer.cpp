@@ -98,6 +98,14 @@ GraphRenderer::GraphRenderer() {
         exit(EXIT_FAILURE);
     }
 
+    // Print out GLFW, OpenGL version and GLEW Version:
+    int iOpenGLMajor = glfwGetWindowAttrib(window, GLFW_CONTEXT_VERSION_MAJOR);
+    int iOpenGLMinor = glfwGetWindowAttrib(window, GLFW_CONTEXT_VERSION_MINOR);
+    int iOpenGLRevision = glfwGetWindowAttrib(window, GLFW_CONTEXT_REVISION);
+    fprintf(stderr, "Status: Using GLFW Version %s\n", glfwGetVersionString());
+    fprintf(stderr, "Status: Using OpenGL Version: %i.%i, Revision: %i\n", iOpenGLMajor, iOpenGLMinor, iOpenGLRevision);
+    fprintf(stderr, "Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
+
     last_update = glfwGetTime();
 
     glfwMakeContextCurrent(window);

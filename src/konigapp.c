@@ -1,7 +1,8 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <libkonig/konig.h>
+
+#include "konig.h"
 
 uint32_t graph_id = 0;
 

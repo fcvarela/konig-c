@@ -23,3 +23,4 @@ uint8_t konig_graph_delete_edge(uint32_t edge_id);
 #endif
 
 #endif
+
