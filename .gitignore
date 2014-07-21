@@ -1,0 +1,7 @@
+
+unix
+!unix/gen-unix.sh
+
+xcode
+!xcode/gen-xcode.sh
+
