@@ -1,4 +1,4 @@
 #!/bin/bash
 
-cmake .. -G Xcode
+cmake .. -G Xcode 
 
