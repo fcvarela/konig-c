@@ -10,7 +10,6 @@ public:
     Texture(uint16_t size, bool init);
     ~Texture();
 
-    uint16_t size;
     GLuint id;
 
     void bind(GLuint textureUnit);

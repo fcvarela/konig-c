@@ -1,7 +1,6 @@
 #include "Texture.h"
 
 Texture::Texture(uint16_t size, bool init) {
-    size = size;
     glGenTextures(1, &id);
 
     glBindTexture(GL_TEXTURE_2D, id);

@@ -32,7 +32,6 @@ void DrawableGraph::step(double dt) {
             glBindBuffer(GL_ARRAY_BUFFER, vbo_out);
             vertex_t *vptr = (vertex_t *)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
 
-            vertex_t temp;
             for (size_t count=0; count<vertex_array.size(); count++) {
                 memcpy(&vertex_array[count], &vptr[count], sizeof(vertex_t));
             }

@@ -23,11 +23,11 @@ private:
 
     GLuint point_texture;
 
-    GLuint output_framebuffer;
-    GLuint picking_framebuffer;
+    //GLuint output_framebuffer;
+    //GLuint picking_framebuffer;
 
-    Texture *output_texture;
-    Texture *picking_texture;
+    //Texture *output_texture;
+    //Texture *picking_texture;
 
 public:
     static GraphRenderer* instance () {

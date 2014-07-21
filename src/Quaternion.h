@@ -214,3 +214,4 @@ template<class T> void Quaternion<T>::glMatrix(GLdouble *mat) {
 typedef Quaternion<double> Quatd;
 
 #endif
+

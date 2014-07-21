@@ -6,6 +6,10 @@ set(CMAKE_C_FLAGS "-Wall -pedantic -fPIC")
 set(CMAKE_C_FLAGS_DEBUG "-g")
 set(CMAKE_C_FLAGS_RELEASE "-O2")
 
+set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -std=c++11")
+set(CMAKE_CXX_FLAGS_DEBUG ${CMAKE_C_FLAGS_DEBUG})
+set(CMAKE_CXX_FLAGS_RELEASE ${CMAKE_C_FLAGS_RELEASE})
+
 # Append the source files here
 list (APPEND KONIG_SOURCES
   src/konig.cpp
@@ -56,3 +60,4 @@ target_link_libraries(${APP_NAME} ${OPENCL_LIBRARIES})
 target_link_libraries(${APP_NAME} SOIL)
 target_link_libraries(${APP_NAME} ${GLEW_LIBRARIES})
 target_link_libraries(${APP_NAME} ${PROTOBUF_LIBRARIES})
+

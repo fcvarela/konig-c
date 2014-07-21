@@ -105,3 +105,4 @@ typedef Vector3<long> Vector3i;
 typedef Vector3<size_t> Vector3u;
 
 #endif
+
