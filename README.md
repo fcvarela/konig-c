@@ -1,4 +1,4 @@
-# Konig Features
+# Konig todo list
 
 ## Graphics
 
@@ -24,4 +24,3 @@
  - Reallocation of vbos only when vectors grow
  - Actual graph representation for Dijskstra, A* searches
  - Topological sorting on acyclic graphs
- 
