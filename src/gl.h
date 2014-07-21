@@ -1,7 +1,7 @@
 #ifndef KONIG_GL_H
 #define KONIG_GL_H
 
-#include <glew.h>
+#include <GL/glew.h>
 
 #ifdef __APPLE__
 #include "OpenCL/opencl.h"

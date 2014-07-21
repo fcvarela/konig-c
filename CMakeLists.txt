@@ -19,33 +19,37 @@ list (APPEND KONIG_SOURCES
   src/konigapp.c
 )
 
-add_executable(${APP_NAME} ${KONIG_SOURCES})
-
-# GLFW + GLEW Deps
+# PKG-CONFIG
 find_package(PkgConfig REQUIRED)
+pkg_search_module(GLFW REQUIRED glfw3)
+
 find_package(OpenGL REQUIRED)
 find_package(OpenCL REQUIRED)
+
 find_package(Protobuf REQUIRED)
+find_package(GLEW REQUIRED)
+find_package(GLFW REQUIRED)
 
-pkg_search_module(GLFW REQUIRED glfw3)
-pkg_search_module(GLEW REQUIRED glew)
-
+# Headers
 include_directories(/usr/local/include/SOIL)
 include_directories(${GLFW_INCLUDE_DIRS})
 include_directories(${GLEW_INCLUDE_DIRS})
-include_directories(${OPENGL_INCLUDE_DIR})
-include_directories(${OPENCL_INCLUDE_DIR})
-include_directories(${PROTOBUF_INCLUDE_DIR})
+include_directories(${OPENGL_INCLUDE_DIRS})
+include_directories(${OPENCL_INCLUDE_DIRS})
+include_directories(${PROTOBUF_INCLUDE_DIRS})
 
-link_directories(/usr/local/lib)
-link_directories(${GLFW_LIBRARY_DIRS})
-link_directories(${GLEW_LIBRARIES})
-link_directories(${OPENGL_LIBRARIES})
-link_directories(${OPENCL_LIBRARIES})
-link_directories(${PROTOBUF_LIBRARIES})
+# Xcode bug workaround
+set(CMAKE_SHARED_LINKER_FLAGS "-L${GLFW_LIBRARY_DIRS}")
+set(CMAKE_EXE_LINKER_FLAGS "-L${GLFW_LIBRARY_DIRS}")
+set(CMAKE_LINKER_LINKER_FLAGS "-L${GLFW_LIBRARY_DIRS}")
+
+set(CMAKE_SHARED_LINKER_FLAGS "-L/usr/local/lib")
+set(CMAKE_EXE_LINKER_FLAGS "-L/usr/local/lib")
+set(CMAKE_LINKER_LINKER_FLAGS "-L/usr/local/lib")
+
+add_executable(${APP_NAME} ${KONIG_SOURCES})
 
 # Linking
-target_link_libraries(${APP_NAME} ${EXTRA_LIBS})
 target_link_libraries(${APP_NAME} ${GLFW_LIBRARIES})
 target_link_libraries(${APP_NAME} ${OPENGL_LIBRARIES})
 target_link_libraries(${APP_NAME} ${OPENCL_LIBRARIES})
