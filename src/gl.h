@@ -29,15 +29,18 @@
 // for pure sequential memory (draw as vbo fast)
 // aligned to 16 bytes for opencl null padding
 typedef struct {
-    float pos[4];
-    float vel[4];
-    float acc[4];
+    cl_float pos[4];
+    cl_float vel[4];
+    cl_float acc[4];
+    cl_float pad[4];
 } vertex_t;
 
 // for pure sequential memory (draw as vbo fast)
 typedef struct {
-    uint32_t vertex_idx1;
-    uint32_t vertex_idx2;
+    cl_uint vertex_idx1;
+    cl_uint vertex_idx2;
+    cl_uint pad1;
+    cl_uint pad2;
 } edge_t;
 
 #endif

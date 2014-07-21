@@ -39,8 +39,8 @@ void GraphRenderer::mouse_move_callback(GLFWwindow *window, double x, double y) 
         glfwGetCursorPos(r->window, &mouse_up_coords[0], &mouse_up_coords[1]);
 
         double mouse_travel[2];
-        mouse_travel[0] -= (mouse_up_coords[0] - r->prev_mouse_coords[0]);
-        mouse_travel[1] = (mouse_up_coords[1] - r->prev_mouse_coords[1]);
+        mouse_travel[0] = (r->prev_mouse_coords[0] - mouse_up_coords[0]);
+        mouse_travel[1] = (r->prev_mouse_coords[1] - mouse_up_coords[1]);
 
         Vector3d delta = Vector3d(mouse_travel[1], mouse_travel[0], 0.0);
         double deltalen = delta.length();
@@ -84,6 +84,7 @@ void GraphRenderer::reshape_callback(GLFWwindow *window, int width, int height) 
 GraphRenderer::GraphRenderer() {
     rotation = Quatd(1.0, 0.0, 0.0, 0.0);
     ctr_distance = 200.0;
+    mouse_down = false;
 
     if (!glfwInit()) {
         fprintf(stderr, "Error intializing glfw\n");
@@ -106,7 +107,9 @@ GraphRenderer::GraphRenderer() {
     fprintf(stderr, "Status: Using OpenGL Version: %i.%i, Revision: %i\n", iOpenGLMajor, iOpenGLMinor, iOpenGLRevision);
     fprintf(stderr, "Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
 
+    // warm up the timer
     last_update = glfwGetTime();
+    std::cerr << last_update << std::endl;
 
     glfwMakeContextCurrent(window);
     glewInit();
@@ -162,7 +165,6 @@ bool GraphRenderer::update(std::map<uint32_t, DrawableGraph*> *graph_list) {
     }
 
     glfwPollEvents();
-
     last_update = glfwGetTime();
     return true;
 }
@@ -196,19 +198,15 @@ bool GraphRenderer::draw(std::map<uint32_t, DrawableGraph*> *graph_list) {
         glBindTexture(GL_TEXTURE_2D, point_texture);
 
         glBindBuffer(GL_ARRAY_BUFFER, graph->vbo_out);
-        glVertexPointer(3, GL_FLOAT, sizeof(vertex_t), 0);
+        glVertexPointer(4, GL_FLOAT, sizeof(vertex_t), 0);
         glDrawArrays(GL_POINTS, 0, graph->vertex_element_count);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         glDisable(GL_TEXTURE_2D);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glColor3f(1.0, 0.0, 0.0);
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glBindBuffer(GL_ARRAY_BUFFER, graph->vbo_out);
-        glVertexPointer(3, GL_FLOAT, sizeof(vertex_t), 0);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, graph->edge_vbo);
-        glDrawElements(GL_LINES, graph->edge_array.size()*2, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_LINES, graph->edge_array.size()*4, GL_UNSIGNED_INT, 0);
         glDisableClientState(GL_VERTEX_ARRAY);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);

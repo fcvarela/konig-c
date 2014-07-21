@@ -95,6 +95,8 @@ uint32_t DrawableGraph::add_edge(uint32_t vertex_idx1, uint32_t vertex_idx2) {
 
     newedge.vertex_idx1 = vertex_idx1;
     newedge.vertex_idx2 = vertex_idx2;
+    newedge.pad1 = 0;
+    newedge.pad2 = 0;
 
     edge_array.push_back(newedge);
 
