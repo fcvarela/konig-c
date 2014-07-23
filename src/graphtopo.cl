@@ -16,10 +16,8 @@ struct __attribute__ ((packed)) Edge {
 __kernel void vertex_step(__global struct Particle *in, __global struct Particle *out) {
     int id = get_global_id(0);
 
-    // coulomb: scale is 1000.0
-    // 1000.0 -> 0.0
     out[id].acc = (float4)(0.0f);
-    float coulomb_constant = 400.0f;
+    float coulomb_constant = 200.0f;
 
     for (int i=0; i<id; i++) {
         float4 d = in[id].pos - in[i].pos;
@@ -37,7 +35,7 @@ __kernel void edge_step(__global struct Edge *ein, __global struct Particle *in,
     int id2 = ein[id].idx2;
 
     float spring_length = 5.0f;
-    float hooke_constant = 400.0f;
+    float hooke_constant = 200.0f;
 
     // hooke
     float4 d = in[id2].pos - in[id1].pos;
