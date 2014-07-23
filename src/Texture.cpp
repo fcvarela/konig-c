@@ -11,7 +11,7 @@ Texture::Texture(uint16_t size, bool init) {
     glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
 
     if (init)
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size, size, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size, size/2, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 }
 
 Texture::~Texture() {

@@ -6,6 +6,10 @@
 #include "Texture.h"
 #include "Vector.h"
 
+bool GraphRenderer::did_resize = false;
+double GraphRenderer::pixel_ratio = 1.0;
+size_t GraphRenderer::framebuffer_size[2] = {0, 0};
+
 void GraphRenderer::mouse_scroll_callback(GLFWwindow *window, double x, double y) {
     GraphRenderer *r = instance();
 
@@ -72,7 +76,10 @@ void GraphRenderer::reshape_callback(GLFWwindow *window, int width, int height) 
     glfwGetWindowSize(window, &width, &height);
 
     // update pixel ratio (in case our window moved to another screen of different pixel density)
-    double pixel_ratio = (double)fb_width/(double)width;
+    pixel_ratio = (double)fb_width/(double)width;
+    framebuffer_size[0] = fb_width;
+    framebuffer_size[1] = fb_height;
+
     glPointSize(8.0*pixel_ratio);
     glLineWidth(1.0*pixel_ratio);
 
@@ -87,6 +94,8 @@ void GraphRenderer::reshape_callback(GLFWwindow *window, int width, int height) 
     // setup modelview
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+
+    did_resize = true;
 }
 
 GraphRenderer::GraphRenderer() {
@@ -130,14 +139,6 @@ GraphRenderer::GraphRenderer() {
     glfwSwapInterval(1);
 
     // load texture here for now: needs refactoring
-    // glGenTextures(1, &point_texture);
-    // glBindTexture(GL_TEXTURE_2D, point_texture);
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // point_texture = SOIL_load_OGL_texture("data/textures/particle.bmp", SOIL_LOAD_AUTO, point_texture, SOIL_FLAG_MIPMAPS);
-
-    // glTexEnvf(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
-    // glEnable(GL_POINT_SPRITE);
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
     glEnable(GL_POINT_SMOOTH);
     glEnable(GL_BLEND);
@@ -145,6 +146,10 @@ GraphRenderer::GraphRenderer() {
     glClearColor(0.9f, 0.9f, 0.9f, 0.0f);
     glEnable(GL_LINE_SMOOTH);
 
+    output_texture = NULL;
+    output_framebuffer = 0;
+
+    // reshape
     GraphRenderer::reshape_callback(window, mode->width/2.0, mode->height/2.0);
 }
 
@@ -171,11 +176,50 @@ bool GraphRenderer::update(std::map<uint32_t, DrawableGraph*> *graph_list) {
     return true;
 }
 
-bool GraphRenderer::draw(std::map<uint32_t, DrawableGraph*> *graph_list) {
-    // glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-    // glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, output_texture->id, 0);
-    //output_texture->bind(GL_TEXTURE1);
+void GraphRenderer::update_framebuffer() {
+    if (output_texture == NULL) {
+        // delete our current framebuffer texture and framebuffer
+        delete output_texture;
+        glDeleteFramebuffers(1, &output_framebuffer);
+    }
 
+    // recreate with appropriate dimensions
+    output_texture = new Texture(framebuffer_size[0], false);
+    glGenFramebuffers(1, &output_framebuffer);
+    did_resize = false;
+}
+
+bool GraphRenderer::draw(std::map<uint32_t, DrawableGraph*> *graph_list) {
+    if (did_resize) {
+        update_framebuffer();
+    }
+
+    // prepare_offscreen();
+    // draw_inner(graph_list);
+    // disable_offscreen();
+    draw_inner(graph_list);
+
+    glFlush();
+    glfwSwapBuffers(window);
+
+    //SOIL_save_screenshot("awesomenessity.bmp", SOIL_SAVE_TYPE_BMP, 0, 0, 1024, 768);
+
+    return true;
+}
+
+void GraphRenderer::prepare_offscreen() {
+    // offscreen render
+    glBindFramebuffer(GL_FRAMEBUFFER, output_framebuffer);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, output_texture->id, 0);
+    output_texture->bind(GL_TEXTURE0);
+}
+
+void GraphRenderer::disable_offscreen() {
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    output_texture->unbind();
+}
+
+void GraphRenderer::draw_inner(std::map<uint32_t, DrawableGraph*> *graph_list) {
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     glLoadIdentity();
 
@@ -208,10 +252,4 @@ bool GraphRenderer::draw(std::map<uint32_t, DrawableGraph*> *graph_list) {
     }
 
     glDisableClientState(GL_VERTEX_ARRAY);
-    // glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    glFlush();
-    glfwSwapBuffers(window);
-    glFinish();
-    return true;
 }

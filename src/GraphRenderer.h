@@ -21,12 +21,12 @@ private:
     double prev_mouse_coords[2];
     double ctr_distance;
 
-    GLuint point_texture;
+    // framebuffers
+    GLuint output_framebuffer = 0;
+    GLuint screen_quad_list;
+    // GLuint picking_framebuffer;
 
-    //GLuint output_framebuffer;
-    //GLuint picking_framebuffer;
-
-    //Texture *output_texture;
+    Texture *output_texture = NULL;
     //Texture *picking_texture;
 
 public:
@@ -35,6 +35,10 @@ public:
         return instance;
     }
 
+    static bool did_resize;
+    static double pixel_ratio;
+    static size_t framebuffer_size[2];
+
     GraphRenderer();
     ~GraphRenderer();
 
@@ -42,6 +46,13 @@ public:
     bool draw(std::map<uint32_t, DrawableGraph*> *graph_list);
 
     bool done();
+
+    // offscreen framebuffer updater (when we resize)
+    void update_framebuffer();
+    void create_screen_quad();
+    void prepare_offscreen();
+    void disable_offscreen();
+    void draw_inner(std::map<uint32_t, DrawableGraph*> *graph_list);
 
     // glu replacements
     static void set_perspective(GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar);
