@@ -221,8 +221,8 @@ bool GraphRenderer::draw(std::map<uint32_t, DrawableGraph*> *graph_list) {
     // draw the bar
     TwDraw();
 
-    glFlush();
-    glFinish();
+    // glFlush();
+    // glFinish();
     glfwSwapBuffers(window);
 
     //SOIL_save_screenshot("awesomenessity.bmp", SOIL_SAVE_TYPE_BMP, 0, 0, 1024, 768);
