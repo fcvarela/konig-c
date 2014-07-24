@@ -33,6 +33,7 @@ find_package(OpenCL REQUIRED)
 find_package(Protobuf REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(GLFW REQUIRED)
+find_package(ANTTWEAKBAR REQUIRED)
 
 # Headers
 include_directories(/usr/local/include/SOIL)
@@ -41,6 +42,7 @@ include_directories(${GLEW_INCLUDE_DIRS})
 include_directories(${OPENGL_INCLUDE_DIRS})
 include_directories(${OPENCL_INCLUDE_DIRS})
 include_directories(${PROTOBUF_INCLUDE_DIRS})
+include_directories(${ANT_TWEAK_BAR_INCLUDE_PATH})
 
 # Xcode bug workaround
 set(CMAKE_SHARED_LINKER_FLAGS "-L${GLFW_LIBRARY_DIRS}")
@@ -60,4 +62,5 @@ target_link_libraries(${APP_NAME} ${OPENCL_LIBRARIES})
 target_link_libraries(${APP_NAME} SOIL)
 target_link_libraries(${APP_NAME} ${GLEW_LIBRARIES})
 target_link_libraries(${APP_NAME} ${PROTOBUF_LIBRARIES})
+target_link_libraries(${APP_NAME} ${ANT_TWEAK_BAR_LIBRARY})
 

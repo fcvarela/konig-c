@@ -11,6 +11,9 @@ double GraphRenderer::pixel_ratio = 1.0;
 size_t GraphRenderer::framebuffer_size[2] = {0, 0};
 
 void GraphRenderer::mouse_scroll_callback(GLFWwindow *window, double x, double y) {
+    if (TwEventMouseWheelGLFW(y) == true)
+        return;
+
     GraphRenderer *r = instance();
 
     r->ctr_distance -= y;
@@ -22,6 +25,9 @@ void GraphRenderer::mouse_scroll_callback(GLFWwindow *window, double x, double y
 }
 
 void GraphRenderer::mouse_click_callback(GLFWwindow *window, int button, int action, int mods) {
+    if (TwEventMouseButtonGLFW(button, action) == true)
+        return;
+
     GraphRenderer *r = instance();
 
     // mouse down?
@@ -35,6 +41,9 @@ void GraphRenderer::mouse_click_callback(GLFWwindow *window, int button, int act
 }
 
 void GraphRenderer::mouse_move_callback(GLFWwindow *window, double x, double y) {
+    if (TwEventMousePosGLFW(x*pixel_ratio, y*pixel_ratio) == true)
+        return;
+
     GraphRenderer *r = instance();
 
     if (r->mouse_down) {
@@ -79,6 +88,9 @@ void GraphRenderer::reshape_callback(GLFWwindow *window, int width, int height) 
     pixel_ratio = (double)fb_width/(double)width;
     framebuffer_size[0] = fb_width;
     framebuffer_size[1] = fb_height;
+
+    // tell tweakbar we've scaled
+    TwWindowSize(fb_width, fb_height);
 
     glPointSize(8.0*pixel_ratio);
     glLineWidth(1.0*pixel_ratio);
@@ -127,8 +139,14 @@ GraphRenderer::GraphRenderer() {
     // warm up the timer
     last_update = glfwGetTime();
 
+    // load glew + tweakbar
     glfwMakeContextCurrent(window);
     glewInit();
+    TwInit(TW_OPENGL, NULL);
+    myBar = TwNewBar("Konig");
+
+    // setup tweakbar variables
+    TwAddVarRW(myBar, "SampleVar", TW_TYPE_BOOL8, &mouse_down, "");
 
     // key, mouse, scroll, resize callbacks
     glfwSetKeyCallback(window, GraphRenderer::key_callback);
@@ -154,6 +172,7 @@ GraphRenderer::GraphRenderer() {
 }
 
 GraphRenderer::~GraphRenderer() {
+    TwTerminate();
     glfwDestroyWindow(window);
     glfwTerminate();
 }
@@ -199,7 +218,11 @@ bool GraphRenderer::draw(std::map<uint32_t, DrawableGraph*> *graph_list) {
     // disable_offscreen();
     draw_inner(graph_list);
 
+    // draw the bar
+    TwDraw();
+
     glFlush();
+    glFinish();
     glfwSwapBuffers(window);
 
     //SOIL_save_screenshot("awesomenessity.bmp", SOIL_SAVE_TYPE_BMP, 0, 0, 1024, 768);

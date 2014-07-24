@@ -6,6 +6,8 @@
 #include "gl.h"
 #include "Quaternion.h"
 
+#include <AntTweakBar.h>
+
 class Texture;
 class DrawableGraph;
 
@@ -14,6 +16,9 @@ class GraphRenderer {
 private:
     GLFWwindow *window;
     double last_update;
+
+    // tweakbar
+    TwBar *myBar;
 
     // translate & rotate
     Quatd rotation;

@@ -26,7 +26,7 @@ int main(int argc, char **argv) {
     // binary tree
     graph_id = konig_add_graph();
     uint32_t root_vid = konig_graph_add_vertex(graph_id);
-    tree(root_vid, 10);
+    tree(root_vid, 9);
 
     // circle
     while (!konig_done()) {

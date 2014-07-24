@@ -58,4 +58,5 @@ void ParticleSolver::step(GLuint vbo_in, GLuint vbo_out, GLuint edge_vbo, size_t
     clEnqueueReleaseGLObjects(queue, 1, &cl_edge_vbo, 0, 0, 0);
 
     clFlush(queue);
+    clFinish(queue);
 }
