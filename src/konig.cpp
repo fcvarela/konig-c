@@ -1,8 +1,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#include <map>
-
 #include "gl.h"
 
 #include "DrawableGraph.h"
@@ -10,7 +8,7 @@
 #include "GraphRPCService.h"
 
 // global graph list for now
-std::map<uint32_t, DrawableGraph*> konig_graph_list;
+DrawableGraph *konig_graph = NULL;
 
 // global renderer
 GraphRenderer *konig_renderer = NULL;
@@ -32,6 +30,9 @@ uint8_t konig_bootstrap(void) {
     // setup the renderer
     konig_renderer = GraphRenderer::instance();
 
+    // graph
+    konig_graph = new DrawableGraph();
+
     // setup the rpc server
     konig_rpc_service = new GraphRPCService();
 
@@ -47,32 +48,31 @@ uint8_t konig_done(void) {
 }
 
 uint8_t konig_update(void) {
-    return konig_renderer->update(&konig_graph_list);
+    // get dt
+    // step graph
+    // step solver
+    // step renderer
+    return konig_renderer->update(konig_graph);
 }
 
 uint8_t konig_draw(void) {
-    return konig_renderer->draw(&konig_graph_list);
+    return konig_renderer->draw(konig_graph);
 }
 
-uint32_t konig_add_graph(void) {
-    konig_graph_list[++konig_graphcount] = new DrawableGraph();
-    return konig_graphcount;
+uint32_t konig_graph_add_vertex() {
+    return konig_graph->add_vertex();
 }
 
-uint32_t konig_graph_add_vertex(uint32_t graph_idx) {
-    return konig_graph_list[graph_idx]->add_vertex();
+uint8_t konig_graph_delete_vertex(uint32_t vertex_idx) {
+    return konig_graph->delete_vertex(vertex_idx);
 }
 
-uint8_t konig_graph_delete_vertex(uint32_t graph_idx, uint32_t vertex_idx) {
-    return konig_graph_list[graph_idx]->delete_vertex(vertex_idx);
+uint32_t konig_graph_add_edge(uint32_t vertex_idx1, uint32_t vertex_idx2) {
+    return konig_graph->add_edge(vertex_idx1, vertex_idx2);
 }
 
-uint32_t konig_graph_add_edge(uint32_t graph_idx, uint32_t vertex_idx1, uint32_t vertex_idx2) {
-    return konig_graph_list[graph_idx]->add_edge(vertex_idx1, vertex_idx2);
-}
-
-uint8_t konig_graph_delete_edge(uint32_t graph_idx, uint32_t edge_idx) {
-    return konig_graph_list[graph_idx]->delete_edge(edge_idx);
+uint8_t konig_graph_delete_edge(uint32_t edge_idx) {
+    return konig_graph->delete_edge(edge_idx);
 }
 
 #ifdef __cplusplus

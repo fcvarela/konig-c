@@ -72,9 +72,9 @@ uint32_t DrawableGraph::add_vertex() {
     vertex_t newvertex;
 
     // randomize starting position (-1 to 1)
-    newvertex.pos[0] = (float)(rand()) / (float)(RAND_MAX);
-    newvertex.pos[1] = (float)(rand()) / (float)(RAND_MAX);
-    newvertex.pos[2] = (float)(rand()) / (float)(RAND_MAX);
+    newvertex.pos[0] = (float)(rand()) / (float)(RAND_MAX) * 500.0;
+    newvertex.pos[1] = (float)(rand()) / (float)(RAND_MAX) * 500.0;
+    newvertex.pos[2] = (float)(rand()) / (float)(RAND_MAX) * 500.0;
     newvertex.pos[3] = 1.0f;
 
     newvertex.vel[0] = 0.0;

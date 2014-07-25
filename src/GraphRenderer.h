@@ -1,8 +1,6 @@
 #ifndef KONIG_GRAPH_RENDERER_H
 #define KONIG_GRAPH_RENDERER_H
 
-#include <map>
-
 #include "gl.h"
 #include "Quaternion.h"
 
@@ -16,6 +14,7 @@ class GraphRenderer {
 private:
     GLFWwindow *window;
     double last_update;
+    uint16_t fps;
 
     // tweakbar
     TwBar *myBar;
@@ -47,8 +46,8 @@ public:
     GraphRenderer();
     ~GraphRenderer();
 
-    bool update(std::map<uint32_t, DrawableGraph*> *graph_list);
-    bool draw(std::map<uint32_t, DrawableGraph*> *graph_list);
+    bool update(DrawableGraph *graph);
+    bool draw(DrawableGraph *graph);
 
     bool done();
 
@@ -57,7 +56,7 @@ public:
     void create_screen_quad();
     void prepare_offscreen();
     void disable_offscreen();
-    void draw_inner(std::map<uint32_t, DrawableGraph*> *graph_list);
+    void draw_inner(DrawableGraph *graph);
 
     // glu replacements
     static void set_perspective(GLdouble fovy, GLdouble aspect, GLdouble zNear, GLdouble zFar);

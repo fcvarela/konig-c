@@ -146,7 +146,9 @@ GraphRenderer::GraphRenderer() {
     myBar = TwNewBar("Konig");
 
     // setup tweakbar variables
-    TwAddVarRW(myBar, "SampleVar", TW_TYPE_BOOL8, &mouse_down, "");
+    TwAddVarRO(myBar, "SampleVar", TW_TYPE_BOOLCPP, &mouse_down, "");
+    TwAddVarRO(myBar, "FPS", TW_TYPE_UINT16, &fps, "");
+    TwAddSeparator(myBar, NULL, NULL);
 
     // key, mouse, scroll, resize callbacks
     glfwSetKeyCallback(window, GraphRenderer::key_callback);
@@ -181,14 +183,11 @@ bool GraphRenderer::done() {
     return glfwWindowShouldClose(window);
 }
 
-bool GraphRenderer::update(std::map<uint32_t, DrawableGraph*> *graph_list) {
+bool GraphRenderer::update(DrawableGraph *graph) {
     double dt = glfwGetTime() - last_update;
+    fps = (uint16_t)(1.0/dt);
 
-    std::map<uint32_t, DrawableGraph *>::iterator iter;
-    for (iter = graph_list->begin(); iter != graph_list->end(); iter++) {
-        DrawableGraph *graph = iter->second;
-        graph->step(dt);
-    }
+    graph->step(dt);
 
     glfwPollEvents();
     last_update = glfwGetTime();
@@ -208,7 +207,7 @@ void GraphRenderer::update_framebuffer() {
     did_resize = false;
 }
 
-bool GraphRenderer::draw(std::map<uint32_t, DrawableGraph*> *graph_list) {
+bool GraphRenderer::draw(DrawableGraph *graph) {
     if (did_resize) {
         update_framebuffer();
     }
@@ -216,7 +215,7 @@ bool GraphRenderer::draw(std::map<uint32_t, DrawableGraph*> *graph_list) {
     // prepare_offscreen();
     // draw_inner(graph_list);
     // disable_offscreen();
-    draw_inner(graph_list);
+    draw_inner(graph);
 
     // draw the bar
     TwDraw();
@@ -242,7 +241,7 @@ void GraphRenderer::disable_offscreen() {
     output_texture->unbind();
 }
 
-void GraphRenderer::draw_inner(std::map<uint32_t, DrawableGraph*> *graph_list) {
+void GraphRenderer::draw_inner(DrawableGraph *graph) {
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     glLoadIdentity();
 
@@ -254,25 +253,21 @@ void GraphRenderer::draw_inner(std::map<uint32_t, DrawableGraph*> *graph_list) {
 
     glEnableClientState(GL_VERTEX_ARRAY);
 
-    std::map<uint32_t, DrawableGraph *>::iterator iter;
-    for (iter = graph_list->begin(); iter != graph_list->end(); iter++) {
-        DrawableGraph *graph = iter->second;
-        if (!graph->inited)
-            continue;
+    if (!graph->inited)
+        return;
 
-        glColor3f(1.0, 0.5, 0.0);
-        glBindBuffer(GL_ARRAY_BUFFER, graph->vbo_out);
-        glVertexPointer(3, GL_FLOAT, sizeof(vertex_t), 0);
-        glDrawArrays(GL_POINTS, 0, graph->vertex_element_count);
+    glColor3f(1.0, 0.5, 0.0);
+    glBindBuffer(GL_ARRAY_BUFFER, graph->vbo_out);
+    glVertexPointer(3, GL_FLOAT, sizeof(vertex_t), 0);
+    glDrawArrays(GL_POINTS, 0, graph->vertex_element_count);
 
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glColor3f(0.7, 0.7, 0.7);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, graph->edge_vbo);
-        glDrawElements(GL_LINES, graph->edge_array.size()*4, GL_UNSIGNED_INT, 0);
-        glDisableClientState(GL_VERTEX_ARRAY);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    }
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glColor3f(0.7, 0.7, 0.7);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, graph->edge_vbo);
+    glDrawElements(GL_LINES, graph->edge_array.size()*4, GL_UNSIGNED_INT, 0);
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     glDisableClientState(GL_VERTEX_ARRAY);
 }
