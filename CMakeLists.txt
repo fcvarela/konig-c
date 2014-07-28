@@ -36,7 +36,6 @@ find_package(GLFW REQUIRED)
 find_package(ANTTWEAKBAR REQUIRED)
 
 # Headers
-include_directories(/usr/local/include/SOIL)
 include_directories(${GLFW_INCLUDE_DIRS})
 include_directories(${GLEW_INCLUDE_DIRS})
 include_directories(${OPENGL_INCLUDE_DIRS})
@@ -56,11 +55,9 @@ set(CMAKE_LINKER_LINKER_FLAGS "-L/usr/local/lib")
 add_executable(${APP_NAME} ${KONIG_SOURCES})
 
 # Linking
-target_link_libraries(${APP_NAME} ${GLFW_LIBRARIES})
+target_link_libraries(${APP_NAME} ${GLFW_STATIC_LIBRARIES})
 target_link_libraries(${APP_NAME} ${OPENGL_LIBRARIES})
 target_link_libraries(${APP_NAME} ${OPENCL_LIBRARIES})
-target_link_libraries(${APP_NAME} SOIL)
 target_link_libraries(${APP_NAME} ${GLEW_LIBRARIES})
 target_link_libraries(${APP_NAME} ${PROTOBUF_LIBRARIES})
 target_link_libraries(${APP_NAME} ${ANT_TWEAK_BAR_LIBRARY})
-

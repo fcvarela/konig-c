@@ -219,12 +219,7 @@ bool GraphRenderer::draw(DrawableGraph *graph) {
 
     // draw the bar
     TwDraw();
-
-    // glFlush();
-    // glFinish();
     glfwSwapBuffers(window);
-
-    //SOIL_save_screenshot("awesomenessity.bmp", SOIL_SAVE_TYPE_BMP, 0, 0, 1024, 768);
 
     return true;
 }
