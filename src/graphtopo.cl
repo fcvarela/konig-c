@@ -36,7 +36,7 @@ __kernel void edge_step(__global struct Edge *ein, __global struct Particle *in,
     int id1 = ein[id].idx1;
     int id2 = ein[id].idx2;
 
-    float spring_length = 5.0f;
+    float spring_length = 10.0f;
     float hooke_constant = 400.0f;
 
     // hooke
